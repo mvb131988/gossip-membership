@@ -1,0 +1,8 @@
+*.jar
+\.project
+\.classpath
+\.factorypath
+\.settings/
+target/*
+/target/
+log*

@@ -1,0 +1,16 @@
+Initial setup:
++ N nodes with predefined addresses
++ Each node opens server socket to listen for N-1 incoming connections
++ Each node connects to N-1 node (except itself)
++ On startup creates vector clock with one record [<node name, JOINING>]
++ Each node creates seen set and adds itself to it [node name]
++ During gossip round sends vector clock together with seen set
+
++ Each node compares its local vector clock with the remote one
+	+ if both are equal add itself to remote seen set
+	+ if there is a difference merge vector clocks, clean seen set abd itself to it
+
++ Once leader node sees N nodes in seen set(convergence) for the specified 
+  time period, it changes one of the JOINIG to UP (vector clock update)
+
++ If converges reached and all nodes are in UP status do nothing  
