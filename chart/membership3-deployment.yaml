@@ -1,0 +1,35 @@
+#minikube service membership1-service
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: membership3-deployment
+  labels:
+    app: membership3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: membership3
+  template:
+    metadata:
+      labels:
+        app: membership3
+    spec:
+      containers:
+        - name: membership3
+          image: membership
+          ports:
+            - name: http
+              containerPort: 8083
+              protocol: TCP
+          env:
+            - name: DEBUG_PORT
+              value: "4003"
+            - name: HOST
+              value: "membership3-service.default.svc.cluster.local"
+            - name: NODES
+              value: "membership1-service.default.svc.cluster.local:8081;membership2-service.default.svc.cluster.local:8082;membership3-service.default.svc.cluster.local:8083"
+            - name: PORT
+              value: "8083"
+          imagePullPolicy: Never

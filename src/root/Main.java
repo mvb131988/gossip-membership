@@ -19,9 +19,19 @@ public class Main {
 		
 		logger.info("Test logger");
 		
-		int port = Integer.parseInt(args[0]);
+		String host = "localhost";
+		if (System.getenv("HOST") != null) {
+			host = System.getenv("HOST");
+		}
+
+		int port = 0;
+		if (System.getenv("PORT") != null) {
+			port = Integer.parseInt(System.getenv("PORT"));
+		} else {
+			port = Integer.parseInt(args[0]);
+		}
 		
-		final InetSocketAddress isa = new InetSocketAddress("localhost", port);
+		final InetSocketAddress isa = new InetSocketAddress("0.0.0.0", port);
 		new Thread(() ->{
 			try {
 				ServerSocket serverSocket = new ServerSocket();
@@ -45,28 +55,36 @@ public class Main {
 				}
 			} catch (IOException | InterruptedException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 			}
 		}).start();
 		
 		for(int i=0; i<nodes.size(); i++) {
 			InetSocketAddress node = nodes.get(i);
-			if(!node.equals(isa)) {
+			if(!node.getHostName().equals(host)) {
 				try {
+					logger.info("Connecting to : " + node.getHostName() + ":" + node.getPort());
+					
 					Socket s = new Socket(node.getHostName(), node.getPort());
 					logger.info("Outbound connection [" + isa.getHostName() + ":" + isa.getPort() + 
 								" connects to " + node.getHostName() + ":" + node.getPort() + "]");
 					
-					String localNode = isa.getHostName() + ":" + isa.getPort();
+					String localNode = host + ":" + port;
 					byte[] bLocalNode = localNode.getBytes();
 					s.getOutputStream().write(bLocalNode.length&0xff);
 					s.getOutputStream().write(bLocalNode.length&0xff00);
 					s.getOutputStream().write(bLocalNode.length&0xff0000);
 					s.getOutputStream().write(bLocalNode.length&0xff000000);
 					s.getOutputStream().write(bLocalNode);
-					
 				} catch (IOException e) {
 					i--;
+					// TODO Auto-generated catch block
+					logger.error(e.getMessage(), e);
+				}
+				
+				try {
+					Thread.sleep(20000);
+				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
