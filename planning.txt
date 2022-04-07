@@ -30,3 +30,11 @@ kubectl apply -f chart\membership2-service.yaml
 kubectl apply -f chart\membership3-service.yaml
 
 build.bat
+
+=========================================================================================
+
+LOCAL RUN:
++ from logback.xml remove FILE appender and leave STDOUT only
++ don't set NODES
++ don't set HOST
++ don't set PORT
