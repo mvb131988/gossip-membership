@@ -18,10 +18,17 @@ public class InboundConnectionManager implements Runnable {
 	
 	private int port;
 	
-	public InboundConnectionManager(ServerSocket ss, String host, int port) {
+	private ConnectionRegistry cr;
+	
+	public InboundConnectionManager(ServerSocket ss, 
+									String host, 
+									int port, 
+									ConnectionRegistry cr) 
+	{
 		this.ss = ss;
 		this.host = host;
 		this.port = port;
+		this.cr = cr;
 	}
 	
 	@Override
@@ -37,15 +44,18 @@ public class InboundConnectionManager implements Runnable {
 
 				int length = b1 ^ b2 ^ b3 ^ b4;
 
-				byte[] bClientNode = new byte[length];
-				clientSocket.getInputStream().read(bClientNode);
+				// host name of the connected member
+				byte[] bMember = new byte[length];
+				clientSocket.getInputStream().read(bMember);
+				String member = new String(bMember);
+				
+				cr.registerInbound(member, clientSocket);
 
 				logger.info("Inbound connection [" + host + ":" + port
-						+ " accepts connection from " + new String(bClientNode) + "]");
+						+ " accepts connection from " + member + "]");
 				Thread.sleep(5000);
 			}
 		} catch (IOException | InterruptedException e) {
-			// TODO Auto-generated catch block
 			logger.error(e.getMessage(), e);
 		}
 	}

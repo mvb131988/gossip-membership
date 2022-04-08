@@ -13,48 +13,56 @@ public class OutboundConnectionManager implements Runnable {
 	private static final Logger logger 
 	  = LoggerFactory.getLogger(OutboundConnectionManager.class);
 	
-	private List<InetSocketAddress> nodes;
+	// host names and ports of all known external members (except the current)
+	private List<InetSocketAddress> members;
 	
 	private String host;
 	
 	private int port;
 	
-	public OutboundConnectionManager(List<InetSocketAddress> nodes, String host, int port) {
-		this.nodes = nodes;
+	private ConnectionRegistry cr;
+	
+	public OutboundConnectionManager(List<InetSocketAddress> members, 
+									 String host, 
+									 int port,
+									 ConnectionRegistry cr) 
+	{
+		this.members = members;
 		this.host = host;
 		this.port = port;
+		this.cr = cr;
 	}
 	
 	@Override
 	public void run() {
-		for(int i=0; i<nodes.size(); i++) {
-			InetSocketAddress node = nodes.get(i);
-			if(!(node.getHostName().equals(host) && node.getPort() == port)) {
+		for(int i=0; i<members.size(); i++) {
+			InetSocketAddress m = members.get(i);
+			if(!(m.getHostName().equals(host) && m.getPort() == port)) {
 				try {
-					logger.info("Connecting to : " + node.getHostName() + ":" + node.getPort());
+					logger.info("Connecting to : " + m.getHostName() + ":" + m.getPort());
 					
-					Socket s = new Socket(node.getHostName(), node.getPort());
+					Socket s = new Socket(m.getHostName(), m.getPort());
+					cr.registerOutbound(m.getHostName() + ":" + m.getPort(), s);
+					
 					logger.info("Outbound connection [" + host + ":" + port + 
-								" connects to " + node.getHostName() + ":" + node.getPort() + "]");
+								" connects to " + m.getHostName() + ":" + m.getPort() + "]");
 					
-					String localNode = host + ":" + port;
-					byte[] bLocalNode = localNode.getBytes();
-					s.getOutputStream().write(bLocalNode.length&0xff);
-					s.getOutputStream().write(bLocalNode.length&0xff00);
-					s.getOutputStream().write(bLocalNode.length&0xff0000);
-					s.getOutputStream().write(bLocalNode.length&0xff000000);
-					s.getOutputStream().write(bLocalNode);
+					String currentMember = host + ":" + port;
+					byte[] bCurrentMemberNode = currentMember.getBytes();
+					s.getOutputStream().write(bCurrentMemberNode.length & 0xff);
+					s.getOutputStream().write(bCurrentMemberNode.length & 0xff00);
+					s.getOutputStream().write(bCurrentMemberNode.length & 0xff0000);
+					s.getOutputStream().write(bCurrentMemberNode.length & 0xff000000);
+					s.getOutputStream().write(bCurrentMemberNode);
 				} catch (IOException e) {
 					i--;
-					// TODO Auto-generated catch block
 					logger.error(e.getMessage(), e);
 				}
 				
 				try {
 					Thread.sleep(20000);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.error(e.getMessage(), e);
 				}
 			}
 		}

@@ -42,18 +42,33 @@ public class Main {
 		
 		logger.info("Starting inbound connection manager thread");
 		
-		InboundConnectionManager icm = new InboundConnectionManager(ss, host, port);
+		ConnectionRegistry cr = new ConnectionRegistry();
+		
+		InboundConnectionManager icm = new InboundConnectionManager(ss, host, port, cr);
 		Thread icmt = new Thread(icm);
 		icmt.setName("InboundConnectionManagerThread");
 		icmt.start();
 		
 		logger.info("Starting outbound connection manager thread");
 		
-		OutboundConnectionManager ocm = new OutboundConnectionManager(nodes, host, port);
+		OutboundConnectionManager ocm = new OutboundConnectionManager(nodes, host, port, cr);
 		Thread ocmt = new Thread(ocm);
 		ocmt.setName("OutboundConnectionManagerThread");
 		ocmt.start();
 		
+		logger.info("Starting gossip sender thread");
+		
+		GossipSender gs = new GossipSender(host, port, cr);
+		Thread gst = new Thread(gs);
+		gst.setName("GossipSenderThread");
+		gst.start();
+		
+		logger.info("Starting gossip receiver thread");
+		
+		GossipReceiver gr = new GossipReceiver(host, port, cr);
+		Thread grt = new Thread(gr);
+		grt.setName("GossipRecevierThread");
+		grt.start();
 	}
 	
 }
