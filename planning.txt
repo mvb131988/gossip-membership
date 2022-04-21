@@ -32,9 +32,23 @@ kubectl apply -f chart\membership3-service.yaml
 build.bat
 
 =========================================================================================
-
 LOCAL RUN:
+
 + from logback.xml remove FILE appender and leave STDOUT only
 + don't set NODES
 + don't set HOST
 + don't set PORT
+
+Preconditions:
+ (1) minikube start
+ (2) minikube docker-env
+ (3) Apply variables generated in (1)
+
+START 2 NODES LOCALLY: 
+ (1) build
+ 	 mvn assembly:assembly -DskipTests 
+ (2) from console: 
+   	 java -jar gossip-membership.jar 8081
+ (3) from IDE:
+   	 java -jar gossip-membership.jar 8082
+=========================================================================================

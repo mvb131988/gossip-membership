@@ -3,7 +3,6 @@ package root;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +29,10 @@ public class GossipReceiver implements Runnable {
 		for(;;) {
 			Member m = cr.nextInbound();
 			if (m != null) {
+
+				logger.info("Member " + host + ":" + port + " checks for incoming messages from " + 
+						m.getHostPort());
+				
 				byte[] input = null;
 				try {
 					int b1 = m.getSocket().getInputStream().read();
@@ -37,22 +40,26 @@ public class GossipReceiver implements Runnable {
 					int b3 = m.getSocket().getInputStream().read();
 					int b4 = m.getSocket().getInputStream().read();
 	
-					int length = b1 ^ b2 ^ b3 ^ b4;
+					int length = b1 ^ (b2 << 8) ^ (b3 << 16) ^ (b4 << 24);
 					input = new byte[length];
+					m.getSocket().getInputStream().read(input);
 				} catch (IOException e) {
 					logger.error(e.getMessage(), e);
 				}
-	
-				Map<String, Integer> vectorCLock = null;
+				
+				logger.info("Member " + host + ":" + port + " receives from " + 
+						m.getHostPort() + " " + input.length + " bytes");
+				
 				try (ByteArrayInputStream bis = new ByteArrayInputStream(input);
 						ObjectInputStream in = new ObjectInputStream(bis)) {
-					vectorCLock = (Map<String, Integer>) in.readObject();
+					GossipMessage gm = null;
+					gm = (GossipMessage) in.readObject();
+				
+					logger.info("Member " + host + ":" + port + " receives vector clock {} from " + 
+							m.getHostPort(), gm);
 				} catch (ClassNotFoundException | IOException e) {
 					logger.error(e.getMessage(), e);
 				}
-				
-				logger.info("Member " + host + ":" + port + " receives vector clock from" + 
-							m.getHostPort());
 			}
 			
 			try {

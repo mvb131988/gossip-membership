@@ -36,19 +36,25 @@ public class GossipSender implements Runnable {
 						ObjectOutputStream out = new ObjectOutputStream(bos)) 
 				{
 					Map<String, Integer> vectorClock = new HashMap<>();
-					vectorClock.put(host + port, 1);
-					out.writeObject(vectorClock);
+					vectorClock.put(host + ":" + port, 1);
+					vectorClock.put(host + ":" + port + 1, 2);
+					GossipMessage gm = new GossipMessage(vectorClock);
+					
+					out.writeObject(gm);
 					byte[] output = bos.toByteArray();
+					
+					logger.info("Member " + host + ":" + port + " sends " + output.length + 
+							" bytes to " + m.getHostPort());
 					
 					OutputStream os = m.getSocket().getOutputStream();
 					os.write(output.length & 0xff);
-					os.write(output.length & 0xff00);
-					os.write(output.length & 0xff0000);
-					os.write(output.length & 0xff000000);
+					os.write((output.length & 0xff00) >> 8);
+					os.write((output.length & 0xff0000) >> 16);
+					os.write((output.length & 0xff000000) >> 24);
 					
 					os.write(output);
 					
-					logger.info("Member " + host + ":" + port + " sends vector clock to" + 
+					logger.info("Member " + host + ":" + port + " sends vector clock to " + 
 								m.getHostPort());
 				} catch (IOException e) {
 					logger.error(e.getMessage(), e);
