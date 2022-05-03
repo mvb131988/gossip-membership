@@ -18,10 +18,16 @@ public class GossipReceiver implements Runnable {
 	
 	private int port;
 	
-	public GossipReceiver(String host, int port, ConnectionRegistry cr) {
+	private MemberStateManager manager;
+	
+	public GossipReceiver(String host, int port, 
+						  ConnectionRegistry cr, 
+						  MemberStateManager manager) 
+	{
 		this.cr = cr;
 		this.host = host;
 		this.port = port;
+		this.manager = manager;
 	}
 	
 	@Override
@@ -57,6 +63,9 @@ public class GossipReceiver implements Runnable {
 				
 					logger.info("Member " + host + ":" + port + " receives vector clock {} from " + 
 							m.getHostPort(), gm);
+					
+					manager.updateMembersState(gm.getVectorClock());
+					
 				} catch (ClassNotFoundException | IOException e) {
 					logger.error(e.getMessage(), e);
 				}

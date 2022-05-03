@@ -56,19 +56,28 @@ public class Main {
 		ocmt.setName("OutboundConnectionManagerThread");
 		ocmt.start();
 		
+		MemberStateManager msm = new MemberStateManager(host + ":" + port);
+		
 		logger.info("Starting gossip sender thread");
 		
-		GossipSender gs = new GossipSender(host, port, cr);
+		GossipSender gs = new GossipSender(host, port, cr, msm);
 		Thread gst = new Thread(gs);
 		gst.setName("GossipSenderThread");
 		gst.start();
 		
 		logger.info("Starting gossip receiver thread");
 		
-		GossipReceiver gr = new GossipReceiver(host, port, cr);
+		GossipReceiver gr = new GossipReceiver(host, port, cr, msm);
 		Thread grt = new Thread(gr);
 		grt.setName("GossipRecevierThread");
 		grt.start();
+		
+		logger.info("Starting timeout connection thread");
+		
+		TimeoutConnectionManager tcm = new TimeoutConnectionManager(msm);
+		Thread tcmt = new Thread(tcm);
+		tcmt.setName("TimeoutConnectionManager");
+		tcmt.start();
 	}
 	
 }

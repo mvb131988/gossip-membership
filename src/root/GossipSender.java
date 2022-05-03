@@ -4,8 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +19,17 @@ public class GossipSender implements Runnable {
 	
 	private int port;
 	
-	public GossipSender(String host, int port, ConnectionRegistry cr) {
+	private MemberStateManager manager;
+	
+	public GossipSender(String host, 
+						int port, 
+						ConnectionRegistry cr, 
+						MemberStateManager manager) 
+	{
 		this.cr = cr;
 		this.host = host;
 		this.port = port;
+		this.manager = manager;
 	}
 	
 	@Override
@@ -35,10 +40,8 @@ public class GossipSender implements Runnable {
 				try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
 						ObjectOutputStream out = new ObjectOutputStream(bos)) 
 				{
-					Map<String, Integer> vectorClock = new HashMap<>();
-					vectorClock.put(host + ":" + port, 1);
-					vectorClock.put(host + ":" + port + 1, 2);
-					GossipMessage gm = new GossipMessage(vectorClock);
+					VectorClockTable vct = manager.updateMemberStateAndGetVectorClockTable();
+					GossipMessage gm = new GossipMessage(vct);
 					
 					out.writeObject(gm);
 					byte[] output = bos.toByteArray();

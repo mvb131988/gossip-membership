@@ -1,23 +1,22 @@
 package root;
 
 import java.io.Serializable;
-import java.util.Map;
 
 public class GossipMessage implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private Map<String, Integer> vectorClock;
+	private VectorClockTable vectorClockTable;
 
-	public GossipMessage(Map<String, Integer> vectorClock) {
-		this.vectorClock = vectorClock;
+	public GossipMessage(VectorClockTable vectorClockTable) {
+		this.vectorClockTable = vectorClockTable;
 	}
 	
-	public Map<String, Integer> getVectorClock() {
-		return vectorClock;
+	public VectorClockTable getVectorClock() {
+		return vectorClockTable;
 	}
 	
-	public void setVectorClock(Map<String, Integer> vectorClock) {
-		this.vectorClock = vectorClock;
+	public void setVectorClock(VectorClockTable vectorClockTable) {
+		this.vectorClockTable = vectorClockTable;
 	}
 	
 	public String toString() {
@@ -25,11 +24,13 @@ public class GossipMessage implements Serializable {
 		
 		sb.append("{");
 		
-		for(Map.Entry<String, Integer> entry: vectorClock.entrySet()) {
-			sb.append(entry.getKey() + "->" + entry.getValue() + ";");
+		for(VectorClock vc: vectorClockTable.getTable()) {
+			sb.append(vc.getMemberId() + "->" + vc.getLamportTimestamp() + ";");
 		}
 		
-		sb.delete(sb.length()-1, sb.length());
+		if(sb.length() > 1) {
+			sb.delete(sb.length()-1, sb.length());
+		}
 		
 		sb.append("}");
 		
