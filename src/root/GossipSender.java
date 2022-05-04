@@ -19,17 +19,17 @@ public class GossipSender implements Runnable {
 	
 	private int port;
 	
-	private MemberStateManager manager;
+	private MemberStateMonitor monitor;
 	
 	public GossipSender(String host, 
 						int port, 
 						ConnectionRegistry cr, 
-						MemberStateManager manager) 
+						MemberStateMonitor monitor) 
 	{
 		this.cr = cr;
 		this.host = host;
 		this.port = port;
-		this.manager = manager;
+		this.monitor = monitor;
 	}
 	
 	@Override
@@ -40,7 +40,7 @@ public class GossipSender implements Runnable {
 				try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
 						ObjectOutputStream out = new ObjectOutputStream(bos)) 
 				{
-					VectorClockTable vct = manager.updateMemberStateAndGetVectorClockTable();
+					VectorClockTable vct = monitor.updateMemberStateAndGetVectorClockTable();
 					GossipMessage gm = new GossipMessage(vct);
 					
 					out.writeObject(gm);

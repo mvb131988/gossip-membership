@@ -2,10 +2,10 @@ package root;
 
 public class TimeoutConnectionManager implements Runnable {
 
-	private MemberStateManager manager;
+	private MemberStateMonitor monitor;
 	
-	public TimeoutConnectionManager(MemberStateManager manager) {
-		this.manager = manager;
+	public TimeoutConnectionManager(MemberStateMonitor monitor) {
+		this.monitor = monitor;
 	}
 	
 	@Override
@@ -18,7 +18,7 @@ public class TimeoutConnectionManager implements Runnable {
 				e.printStackTrace();
 			}
 			
-			manager.inactivateMember(System.currentTimeMillis(), 200_000);
+			monitor.inactivateMember(System.currentTimeMillis(), 200_000);
 		}
 	}
 

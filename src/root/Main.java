@@ -56,7 +56,7 @@ public class Main {
 		ocmt.setName("OutboundConnectionManagerThread");
 		ocmt.start();
 		
-		MemberStateManager msm = new MemberStateManager(host + ":" + port);
+		MemberStateMonitor msm = new MemberStateMonitor(host + ":" + port);
 		
 		logger.info("Starting gossip sender thread");
 		
@@ -78,6 +78,13 @@ public class Main {
 		Thread tcmt = new Thread(tcm);
 		tcmt.setName("TimeoutConnectionManager");
 		tcmt.start();
+		
+		logger.info("Member state observer thread");
+		
+		MemberStateObserver mso = new MemberStateObserver(host, port, msm);
+		Thread msot = new Thread(mso);
+		msot.setName("MemberStateObserver");
+		msot.start();
 	}
 	
 }

@@ -36,4 +36,22 @@ public class MemberStateTable {
 		return vectorClockTable;
 	}
 	
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append("{");
+		
+		for(MemberState ms: table) {
+			sb.append(ms.getMemberId() + "->" + ms.getState() + ";");
+		}
+		
+		if(sb.length() > 1) {
+			sb.delete(sb.length()-1, sb.length());
+		}
+		
+		sb.append("}");
+		
+		return sb.toString();
+	}
+	
 }

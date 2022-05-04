@@ -1,11 +1,11 @@
 package root;
 
-public class MemberStateManager {
+public class MemberStateMonitor {
 
 	private String memberId;
 	private MemberStateTable table;
 	
-	public MemberStateManager(String memberId) {
+	public MemberStateMonitor(String memberId) {
 		super();
 		this.memberId = memberId;
 		this.table = new MemberStateTable();
@@ -64,6 +64,19 @@ public class MemberStateManager {
 				state.setState("INACTIVE");
 			}
 		}
+	}
+	
+	public synchronized MemberStateTable getMemberStateTable() {
+		MemberStateTable copy = new MemberStateTable();
+		
+		for(MemberState ms: table.getTable()) {
+			copy.add(new MemberState(ms.getMemberId(), 
+									 ms.getLamportTimestamp(), 
+									 ms.getLocalTimestamp(), 
+									 ms.getState()));
+		}
+		
+		return copy;
 	}
 	
 }
