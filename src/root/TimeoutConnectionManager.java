@@ -11,14 +11,14 @@ public class TimeoutConnectionManager implements Runnable {
 	@Override
 	public void run() {
 		for(;;) {
-			manager.inactivateMember(System.currentTimeMillis(), 20_000);
-			
 			try {
-				Thread.sleep(20_000);
+				Thread.sleep(200_000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
+			manager.inactivateMember(System.currentTimeMillis(), 200_000);
 		}
 	}
 

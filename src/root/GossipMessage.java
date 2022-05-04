@@ -7,6 +7,10 @@ public class GossipMessage implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private VectorClockTable vectorClockTable;
 
+	public GossipMessage() {
+		
+	}
+	
 	public GossipMessage(VectorClockTable vectorClockTable) {
 		this.vectorClockTable = vectorClockTable;
 	}

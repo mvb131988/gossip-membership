@@ -58,7 +58,9 @@ public class MemberStateManager {
 	
 	public synchronized void inactivateMember(long timestamp, long timeout) {
 		for(MemberState state: table.getTable()) {
-			if(state.getLocalTimestamp() + timeout > timestamp) {
+			if(state.getMemberId() != memberId && 
+			   state.getLocalTimestamp() + timeout > timestamp) 
+			{
 				state.setState("INACTIVE");
 			}
 		}
