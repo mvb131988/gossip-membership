@@ -51,28 +51,38 @@ public class GossipReceiver implements Runnable {
 					m.getSocket().getInputStream().read(input);
 				} catch (IOException e) {
 					logger.error(e.getMessage(), e);
+					cr.removeConnection(m.getHostPort());
 				}
 				
-				logger.info("Member " + host + ":" + port + " receives from " + 
-						m.getHostPort() + " " + input.length + " bytes");
-				
-				try (ByteArrayInputStream bis = new ByteArrayInputStream(input);
-						ObjectInputStream in = new ObjectInputStream(bis)) {
-					GossipMessage gm = null;
-					gm = (GossipMessage) in.readObject();
-				
-					logger.info("Member " + host + ":" + port + " receives vector clock {} from " + 
-							m.getHostPort(), gm);
+				// when failure happens input could be left uninitialized
+				// input == null
+				// when invoked in logger this leads to NullPointer and to GossipReceiver 
+				// thread death
+				if(input != null) {
+					logger.info("Member " + host + ":" + port + " receives from " + 
+							m.getHostPort() + " " + input.length + " bytes");
 					
-					monitor.updateMembersState(gm.getVectorClock());
+					try (ByteArrayInputStream bis = new ByteArrayInputStream(input);
+							ObjectInputStream in = new ObjectInputStream(bis)) {
+						GossipMessage gm = null;
+						gm = (GossipMessage) in.readObject();
 					
-				} catch (ClassNotFoundException | IOException e) {
-					logger.error(e.getMessage(), e);
+						logger.info("Member " + host + ":" + port + " receives vector clock {} from " + 
+								m.getHostPort(), gm);
+						
+						long timestamp = System.currentTimeMillis();
+						monitor.updateMembersState(gm.getVectorClock(), 
+												   m.getHostPort(), 
+												   timestamp);
+						
+					} catch (ClassNotFoundException | IOException e) {
+						logger.error(e.getMessage(), e);
+					}
 				}
 			}
 			
 			try {
-				Thread.sleep(20000);
+				Thread.sleep(2000);
 			} catch (InterruptedException e) {
 				logger.error(e.getMessage(), e);
 			}

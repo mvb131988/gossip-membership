@@ -40,7 +40,8 @@ public class GossipSender implements Runnable {
 				try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
 						ObjectOutputStream out = new ObjectOutputStream(bos)) 
 				{
-					VectorClockTable vct = monitor.updateMemberStateAndGetVectorClockTable();
+					long timestamp = System.currentTimeMillis();
+					VectorClockTable vct = monitor.updateMemberStateAndGetVectorClockTable(timestamp);
 					GossipMessage gm = new GossipMessage(vct);
 					
 					out.writeObject(gm);
@@ -57,15 +58,16 @@ public class GossipSender implements Runnable {
 					
 					os.write(output);
 					
-					logger.info("Member " + host + ":" + port + " sends vector clock to " + 
-								m.getHostPort());
+					logger.info("Member " + host + ":" + port + " sends vector clock {} to " + 
+								m.getHostPort(), gm);
 				} catch (IOException e) {
 					logger.error(e.getMessage(), e);
+					cr.removeConnection(m.getHostPort());
 				}
 			}
 			
 			try {
-				Thread.sleep(20000);
+				Thread.sleep(2000);
 			} catch (InterruptedException e) {
 				logger.error(e.getMessage(), e);
 			}

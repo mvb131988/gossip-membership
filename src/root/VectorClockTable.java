@@ -2,7 +2,9 @@ package root;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class VectorClockTable implements Serializable {
 
@@ -10,9 +12,16 @@ public class VectorClockTable implements Serializable {
 	
 	private List<VectorClock> table;
 	
+	private Set<String> seenByMembers;
+	
 	public VectorClockTable() {
 		super();
 		this.table = new ArrayList<>();
+		this.seenByMembers = new HashSet<>();
+	}
+
+	public Set<String> getSeenByMembers() {
+		return seenByMembers;
 	}
 
 	public List<VectorClock> getTable() {
@@ -25,6 +34,10 @@ public class VectorClockTable implements Serializable {
 
 	public void add(VectorClock vc) {
 		table.add(vc);
+	}
+	
+	public void addSeenBy(String seenMemberId) {
+		seenByMembers.add(seenMemberId);
 	}
 	
 }

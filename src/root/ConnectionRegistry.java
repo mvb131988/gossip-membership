@@ -1,11 +1,18 @@
 package root;
 
+import java.io.IOException;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ConnectionRegistry {
 
+	private static final Logger logger 
+	  = LoggerFactory.getLogger(ConnectionRegistry.class);
+	
 	private Map<String, MemberLink> registry = new HashMap<>();
 	
 	//TODO: when member is removed the key it's associated with is 
@@ -53,6 +60,23 @@ public class ConnectionRegistry {
 			registryIndex.put(size + 1, key);
 		}
 		ml.setOutboundConnection(out);
+	}
+	
+	public boolean existOutbound(String key) {
+		return registry.get(key) != null && registry.get(key).getOutboundConnection() != null;
+	}
+	
+	public void removeConnection(String key) {
+		MemberLink ml = registry.get(key);
+		if(ml != null) {
+			try {
+				ml.getInboundConnection().close();
+				ml.getOutboundConnection().close();
+			} catch(IOException ex) {
+				logger.error(ex.getMessage(), ex);
+			}
+			registry.remove(key);
+		} 
 	}
 	
 	public Member nextOutbound() {

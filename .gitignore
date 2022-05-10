@@ -1,4 +1,5 @@
 *.jar
+*.gz
 \.project
 \.classpath
 \.factorypath

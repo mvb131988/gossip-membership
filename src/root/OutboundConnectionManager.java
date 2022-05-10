@@ -35,35 +35,38 @@ public class OutboundConnectionManager implements Runnable {
 	
 	@Override
 	public void run() {
-		for(int i=0; i<members.size(); i++) {
-			InetSocketAddress m = members.get(i);
-			if(!(m.getHostName().equals(host) && m.getPort() == port)) {
-				try {
-					logger.info("Connecting to : " + m.getHostName() + ":" + m.getPort());
-					
-					Socket s = new Socket(m.getHostName(), m.getPort());
-					cr.registerOutbound(m.getHostName() + ":" + m.getPort(), s);
-					
-					logger.info("Outbound connection [" + host + ":" + port + 
-								" connects to " + m.getHostName() + ":" + m.getPort() + "]");
-					
-					String currentMember = host + ":" + port;
-					byte[] bCurrentMemberNode = currentMember.getBytes();
-					s.getOutputStream().write(bCurrentMemberNode.length & 0xff);
-					s.getOutputStream().write(bCurrentMemberNode.length & 0xff00);
-					s.getOutputStream().write(bCurrentMemberNode.length & 0xff0000);
-					s.getOutputStream().write(bCurrentMemberNode.length & 0xff000000);
-					s.getOutputStream().write(bCurrentMemberNode);
-				} catch (IOException e) {
-					i--;
-					logger.error(e.getMessage(), e);
+		for (;;) {
+			for(int i=0; i<members.size(); i++) {
+				InetSocketAddress m = members.get(i);
+				if(!(m.getHostName().equals(host) && m.getPort() == port) && 
+				   !cr.existOutbound(m.getHostName() + ":" + m.getPort())) 
+				{
+					try {
+						logger.info("Connecting to : " + m.getHostName() + ":" + m.getPort());
+						
+						Socket s = new Socket(m.getHostName(), m.getPort());
+						cr.registerOutbound(m.getHostName() + ":" + m.getPort(), s);
+						
+						logger.info("Outbound connection [" + host + ":" + port + 
+									" connects to " + m.getHostName() + ":" + m.getPort() + "]");
+						
+						String currentMember = host + ":" + port;
+						byte[] bCurrentMemberNode = currentMember.getBytes();
+						s.getOutputStream().write(bCurrentMemberNode.length & 0xff);
+						s.getOutputStream().write(bCurrentMemberNode.length & 0xff00);
+						s.getOutputStream().write(bCurrentMemberNode.length & 0xff0000);
+						s.getOutputStream().write(bCurrentMemberNode.length & 0xff000000);
+						s.getOutputStream().write(bCurrentMemberNode);
+					} catch (IOException e) {
+						logger.error(e.getMessage(), e);
+					}
 				}
-				
-				try {
-					Thread.sleep(20000);
-				} catch (InterruptedException e) {
-					logger.error(e.getMessage(), e);
-				}
+			}
+			
+			try {
+				Thread.sleep(20000);
+			} catch (InterruptedException e) {
+				logger.error(e.getMessage(), e);
 			}
 		}
 	}
