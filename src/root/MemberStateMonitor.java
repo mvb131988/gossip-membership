@@ -110,6 +110,10 @@ public class MemberStateMonitor {
 		
 		boolean allMSsInVCT = true;
 		for(MemberState ms: table.getTable()) {
+			if(!ms.getState().equals("ACTIVE")) {
+				continue;
+			}
+			
 			// find current member state in vector clock table 
 			boolean msFound = false;
 			for(VectorClock vc: vectorClockTable.getTable()) {
@@ -134,9 +138,18 @@ public class MemberStateMonitor {
 		
 	}
 	
+	/**
+	 * Inactivates members that are currently ACTIVE but no healthcheck/gossip messages
+	 * received within the timeout (since last message).
+	 * 
+	 * @param timestamp - timestamp of the running member
+	 * @param timeout - timeout between two sequential gossip messages. When it's reached member 
+	 * 					might be considered INACTIVE
+	 */
 	public synchronized void inactivateMember(long timestamp, long timeout) {
 		for(MemberState state: table.getTable()) {
-			if(state.getMemberId() != memberId && 
+			if(state.getState().equals("ACTIVE") &&
+			   state.getMemberId() != memberId && 
 			   state.getLocalTimestamp() + timeout < timestamp) 
 			{
 				state.setState("INACTIVE");
@@ -146,7 +159,12 @@ public class MemberStateMonitor {
 		}
 	}
 	
-	public synchronized MemberStateTable getMemberStateTable() {
+	/**
+	 * Copies member state table into new object.
+	 * 
+	 * @return - copy of member state table.
+	 */
+	public synchronized MemberStateTable copyMemberStateTable() {
 		MemberStateTable copy = new MemberStateTable();
 		
 		for(MemberState ms: table.getTable()) {

@@ -31,7 +31,7 @@ public class MemberStateObserver implements Runnable {
 				e.printStackTrace();
 			}
 			
-			MemberStateTable table = monitor.getMemberStateTable();
+			MemberStateTable table = monitor.copyMemberStateTable();
 			logger.info("Members state from member " + host + ":" + port + " " + table.toString());
 			
 			logger.info("Members state from member " + host + ":" + port + " seen by members: " + table.toStringSeenBy());
