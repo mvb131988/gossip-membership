@@ -126,6 +126,34 @@ public class ConnectionRegistry {
 		return registry.get(key) != null && registry.get(key).getOutboundConnection() != null;
 	}
 	
+	/**
+	 * Connection allocation algorithm round robin like approach. Go from left to right until
+	 * active connection is not found. If end of queue is reached move back to the beginning
+	 * of the queue. If no active are in the queue return null.
+	 * 
+	 * Example1(A-active,I-inactive)
+	 * 
+	 * index      1  2  3  4
+	 * host name  m1 m2 m3 m4
+	 * status     A  I  A  I
+	 * 
+	 * 1st call:
+	 * Suppose currentInboundIndex=0 (that translates in 1 in registryIndexMap). First connection
+	 * is active return it, increase currentInboundIndex.
+	 * 
+	 * 2nd call:
+	 * currentInboundIndex = 1 (that translates in 2 in registryIndexMap). Connection is inactive
+	 * try next one. Next one (3 in registryIndexMap) is active return it and change 
+	 * currentInboundIndex to the current position + 1(4 in registryIndexMap translates in 
+	 * currentInboundIndex = 3).
+	 * 
+	 * 3rd call:
+	 * currentInboundIndex = 3 (that translates in 4 in registryIndexMap). Since connection is 
+	 * inactive and end of queue is reached come back to the beginning of the queue.
+	 * It's active, return it and change currentInboundIndex = 0+1
+	 * 
+	 * @return next inbound connection or null if there are no initialized member links. 
+	 */
 	public Member nextInbound() {
 		int index = currentInboundIndex + 1;
 		int tmpIndex = index;
@@ -160,6 +188,11 @@ public class ConnectionRegistry {
 		return m;
 	}
 	
+	/**
+	 * Check nextInbound as the same approach used here.
+	 * 
+	 * @return @return next outbound connection or null if there are no initialized member links.
+	 */
 	public Member nextOutbound() {
 		int index = currentOutboundIndex + 1;
 		int tmpIndex = index;
