@@ -129,7 +129,26 @@ public class MemberStateMonitor {
 			}
 		}
 		
-		if(allMSsInVCT) {
+		// there is case when one member state is INACTIVE, but in received vector clock  
+		// it is present (hence not inserted at the update stage)
+		boolean allVCsInMST = true;
+		for(VectorClock vc: vectorClockTable.getTable()) {
+			// find current vector clock in member state table 
+			boolean vcFound = false;
+			for(MemberState ms: table.getTable()) {
+				if(vc.getMemberId().equals(ms.getMemberId()) && ms.getState().equals("ACTIVE")) {
+					vcFound = true;
+					break;
+				}
+			}
+			
+			if (!vcFound) {
+				allVCsInMST = false;
+				break;
+			}
+		}
+		
+		if(allMSsInVCT && allVCsInMST) {
 			table.addSeenBy(senderMember);
 		} else {
 			table.resetSeenBy();

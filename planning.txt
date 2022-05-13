@@ -54,3 +54,9 @@ START 2 NODES LOCALLY:
  (3) from IDE:
    	 java -jar gossip-membership.jar 8082
 =========================================================================================
+
++ InboundConnectionManager dies on error
++ sync ConnectionRegistry
++ on node restart & when Lamport timestamp is getting too big and need reset
+  send value -1 to all discovered neighbors, use this value as a sign to reset
+  vector clock value of the member that sent this vector clock

@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 public class MemberStateMonitorTest {
 
 	@Test
-	public void testUpdateMemberStateAndGetVectorClockTable() throws NoSuchFieldException,
+	public void testUpdateMemberStateAndGetVectorClockTable1() throws NoSuchFieldException,
 							  										 SecurityException, 
 							  										 IllegalArgumentException,
 							  										 IllegalAccessException 
@@ -269,6 +269,63 @@ public class MemberStateMonitorTest {
 				() -> assertEquals(mst.getTable().get(2).getState(), "INACTIVE"));
 		
 		Set<String> targetSeenBy = Set.of("member1", "member2");
+		
+		assertTrue(mst.getSeenByMembers().containsAll(targetSeenBy));
+		assertTrue(targetSeenBy.containsAll(mst.getSeenByMembers()));
+	}
+	
+	@Test
+	public void updateMembersState5() throws NoSuchFieldException, 
+											 SecurityException, 
+											 IllegalArgumentException, 
+											 IllegalAccessException 
+	{
+		MemberStateTable mst = new MemberStateTable();
+		mst.add(new MemberState("member1", 15, 0, "INACTIVE"));
+		mst.add(new MemberState("member2", 11, 0, "ACTIVE"));
+		mst.add(new MemberState("member3", 17, 0, "ACTIVE"));
+		mst.addSeenBy("member2");
+		mst.addSeenBy("member3");
+		
+		MemberStateMonitor msm = new MemberStateMonitor();
+		
+		Field f1 = msm.getClass().getDeclaredField("memberId");
+		Field f2 = msm.getClass().getDeclaredField("table");
+		
+		f1.setAccessible(true);
+		f2.setAccessible(true);
+		f1.set(msm, "member2");
+		f2.set(msm, mst);
+		f1.setAccessible(false);
+		f2.setAccessible(false);
+		
+		long timestamp = System.currentTimeMillis();
+		
+		VectorClockTable vct = new VectorClockTable();
+		vct.add(new VectorClock("member1", 3));
+		vct.add(new VectorClock("member2", 23));
+		vct.add(new VectorClock("member3", 20));
+		vct.addSeenBy("member2");
+		
+		String senderMember = "member1";
+
+		msm.updateMembersState(vct, senderMember, timestamp);
+		
+		assertAll("mst",
+				() -> assertEquals(mst.getTable().get(0).getMemberId(), "member1"),
+				() -> assertEquals(mst.getTable().get(0).getLamportTimestamp(), 15),
+				() -> assertEquals(mst.getTable().get(0).getLocalTimestamp(), 0),
+				() -> assertEquals(mst.getTable().get(0).getState(), "INACTIVE"),
+				() -> assertEquals(mst.getTable().get(1).getMemberId(), "member2"),
+				() -> assertEquals(mst.getTable().get(1).getLamportTimestamp(), 23),
+				() -> assertEquals(mst.getTable().get(1).getLocalTimestamp(), timestamp),
+				() -> assertEquals(mst.getTable().get(1).getState(), "ACTIVE"),
+				() -> assertEquals(mst.getTable().get(2).getMemberId(), "member3"),
+				() -> assertEquals(mst.getTable().get(2).getLamportTimestamp(), 20),
+				() -> assertEquals(mst.getTable().get(2).getLocalTimestamp(), timestamp),
+				() -> assertEquals(mst.getTable().get(2).getState(), "ACTIVE"));
+		
+		Set<String> targetSeenBy = Set.of("member2");
 		
 		assertTrue(mst.getSeenByMembers().containsAll(targetSeenBy));
 		assertTrue(targetSeenBy.containsAll(mst.getSeenByMembers()));

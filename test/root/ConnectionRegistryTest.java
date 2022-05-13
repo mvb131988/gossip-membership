@@ -34,7 +34,6 @@ public class ConnectionRegistryTest {
 		Map<String, MemberLink> registry = new HashMap<>();
 		registry.put("member1", ml);
 		Deque<String> inboundQueue = new LinkedList<>();
-		inboundQueue.add("member1");
 		
 		setPrivateFieldValue(cr, "registry", registry);
 		setPrivateFieldValue(cr, "inboundQueue", inboundQueue);
@@ -97,7 +96,6 @@ public class ConnectionRegistryTest {
 		Map<String, MemberLink> registry = new HashMap<>();
 		registry.put("member1", ml);
 		Deque<String> outboundQueue = new LinkedList<>();
-		outboundQueue.add("member1");
 		
 		setPrivateFieldValue(cr, "registry", registry);
 		setPrivateFieldValue(cr, "outboundQueue", outboundQueue);

@@ -38,8 +38,8 @@ public class ConnectionRegistry {
 		if(ml == null) {
 			ml = new MemberLink();
 			registry.put(key, ml);
-			inboundQueue.add(key);
 		}
+		inboundQueue.add(key);
 		ml.setInboundConnection(in);
 	}
 	
@@ -54,8 +54,8 @@ public class ConnectionRegistry {
 		if(ml == null) {
 			ml = new MemberLink();
 			registry.put(key, ml);
-			outboundQueue.add(key);
 		}
+		outboundQueue.add(key);
 		ml.setOutboundConnection(out);
 	}
 	
