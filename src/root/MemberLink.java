@@ -9,13 +9,7 @@ public class MemberLink {
 	// when current member is connected to external then connection is called outbound
 	private Socket outboundConnection;
 	
-	private int orderIndex;
-	
 	public MemberLink() {
-	}
-	
-	public MemberLink(int orderIndex) {
-		this.orderIndex = orderIndex;
 	}
 	
 	public Socket getOutboundConnection() {
@@ -32,14 +26,6 @@ public class MemberLink {
 
 	public void setInboundConnection(Socket inboundConnection) {
 		this.inboundConnection = inboundConnection;
-	}
-	
-	public int getOrderIndex() {
-		return orderIndex;
-	}
-
-	public void setOrderIndex(int orderIndex) {
-		this.orderIndex = orderIndex;
 	}
 	
 }
