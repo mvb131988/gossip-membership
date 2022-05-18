@@ -1,12 +1,23 @@
 package root;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 public class MemberStateMonitor {
 
+	private static final Logger logger 
+	  = LoggerFactory.getLogger(MemberStateMonitor.class);
+	
+	private boolean resetMode;
+	
+	private boolean confirmResetMode;
+	
 	private String memberId;
+	
 	private MemberStateTable table;
 	
 	public MemberStateMonitor() {
-		
 	}
 	
 	public MemberStateMonitor(String memberId) {
@@ -15,8 +26,67 @@ public class MemberStateMonitor {
 		this.table = new MemberStateTable();
 		this.table.add(new MemberState(this.memberId, 1, System.currentTimeMillis(), "ACTIVE"));
 		this.table.addSeenBy(memberId);
+		this.resetMode = true;
+		this.confirmResetMode = false;
 	}
 
+	public synchronized 
+	VectorClockTable updateMemberStateAndGetVectorClockTable(long currentTimestamp) {
+		if(resetMode) {
+			resetMemberState(currentTimestamp);
+			switchToConfirmResetMode();
+		} else if (confirmResetMode) {
+			confirmResetMemberState(currentTimestamp);
+			switchToNormalMode();
+		} else {
+			updateMemberState(currentTimestamp);
+			verifyLamportTimestamp(currentTimestamp);
+		}
+		return table.toVectorClockTable();
+	}
+	
+	private void switchToConfirmResetMode() {
+		MemberState ms1 = null;
+		for(MemberState ms: table.getTable()) {
+			if(ms.getMemberId().equals(memberId)) {
+				ms1 = ms;
+				break;
+			}
+		}
+		
+		if(ms1.getLamportTimestamp() == -1 && table.seenResetByAll()) {
+			resetMode = false;
+			confirmResetMode = true;
+		}
+	}
+	
+	private void switchToNormalMode() {
+		MemberState ms1 = null;
+		for(MemberState ms: table.getTable()) {
+			if(ms.getMemberId().equals(memberId)) {
+				ms1 = ms;
+				break;
+			}
+		}
+		
+		if(ms1.getLamportTimestamp() == 0 && table.seenConfirmResetByAll()) {
+			resetMode = false;
+			confirmResetMode = false;
+		}
+	}
+	
+	private void verifyLamportTimestamp(long currentTimestamp) {
+		for (MemberState state : table.getTable()) {
+			if (state.getMemberId().equals(memberId)) {
+				if(state.getLamportTimestamp() > 10) {
+					resetMode = true;
+					table.resetSeenResetBy();
+					table.resetSeenConfirmResetBy();
+				}
+			}
+		}
+	}
+	
 	/**
 	 * Updates Lamport timestamp and local timestamp (local timestamp is the last timestamp
 	 * on the given machine obtained by System.currentTimeMillis(); it shows when member
@@ -27,16 +97,33 @@ public class MemberStateMonitor {
 	 * @return vector clock table of the current member
 	 */
 	public synchronized 
-	VectorClockTable updateMemberStateAndGetVectorClockTable(long currentTimestamp) {
-		updateMemberState(currentTimestamp);
-		return table.toVectorClockTable();
-	}
-
-	private void updateMemberState(long currentTimestamp) {
+	void updateMemberState(long currentTimestamp) {
 		for (MemberState state : table.getTable()) {
 			if (state.getMemberId().equals(memberId)) {
 				state.setLamportTimestamp(state.getLamportTimestamp() + 1);
 				state.setLocalTimestamp(currentTimestamp);
+			}
+		}
+	}
+
+	public synchronized 
+	void resetMemberState(long currentTimestamp) {
+		for (MemberState state : table.getTable()) {
+			if (state.getMemberId().equals(memberId)) {
+				state.setLamportTimestamp(-1);
+				state.setLocalTimestamp(currentTimestamp);
+				table.addSeenResetBy(memberId);
+			}
+		}
+	}
+	
+	public synchronized 
+	void confirmResetMemberState(long currentTimestamp) {
+		for (MemberState state : table.getTable()) {
+			if (state.getMemberId().equals(memberId)) {
+				state.setLamportTimestamp(0);
+				state.setLocalTimestamp(currentTimestamp);
+				table.addSeenConfirmResetBy(memberId);
 			}
 		}
 	}
@@ -64,10 +151,20 @@ public class MemberStateMonitor {
 					   String senderMember, 
 					   long currentTimestamp) 
 	{
-		updateMemberState(currentTimestamp);
+		updateMemberStateAndGetVectorClockTable(currentTimestamp);
 
 		boolean insertMemberState = false;
 		for(VectorClock vc: vectorClockTable.getTable()) {
+			if(vc.getMemberId().equals(memberId)) {
+				if(vc.getLamportTimestamp() == -1) {
+					table.addSeenResetBy(senderMember);
+				}
+				if(vc.getLamportTimestamp() == 0) {
+					table.addSeenConfirmResetBy(senderMember);
+				}
+				continue;
+			}
+			
 			MemberState ms1 = null;
 			
 			for(MemberState ms: table.getTable()) {
@@ -84,12 +181,47 @@ public class MemberStateMonitor {
 										  "ACTIVE")
 						 );
 				insertMemberState = true;
+				
+				//TODO: check why to do this
+				//table.resetSeenBy();
+				//resetMode = true;
 			} else {
-				if(ms1.getLamportTimestamp() < vc.getLamportTimestamp()) {
-					ms1.setLamportTimestamp(vc.getLamportTimestamp());
-					ms1.setLocalTimestamp(currentTimestamp);
-					ms1.setState("ACTIVE");
-				}
+//				if((vc.getLamportTimestamp() == -1) ||
+//				      ms1.getLamportTimestamp() < vc.getLamportTimestamp()) {
+//					
+					//when one member is down while its Lamport timestamp == - 1
+					//remaining two members propagate its value it's updated and 
+				    //hence member never dies
+				
+					//once -1 is set only 0 could rewrite it
+//					if(!(ms1.getLamportTimestamp() == -1 || ms1.getLamportTimestamp() == 0)) {
+//					    ms1.setLamportTimestamp(vc.getLamportTimestamp());
+//						ms1.setLocalTimestamp(currentTimestamp);
+//						ms1.setState("ACTIVE");
+//					}
+//					else if(vc.getLamportTimestamp() == 0) {
+//						ms1.setLamportTimestamp(vc.getLamportTimestamp());
+//						ms1.setLocalTimestamp(currentTimestamp);
+//						ms1.setState("ACTIVE");
+//					}
+					
+					if(ms1.getLamportTimestamp() != -1) {
+						if((vc.getLamportTimestamp() == -1) ||
+							ms1.getLamportTimestamp() < vc.getLamportTimestamp()) 
+						{
+							if(vc.getLamportTimestamp() == -1) {
+								ms1.setLamportTimestamp(vc.getLamportTimestamp());
+								ms1.setLocalTimestamp(currentTimestamp);
+								ms1.setState("ACTIVE");
+							}
+						}
+					} else {
+						if(vc.getLamportTimestamp() == 0) {
+							ms1.setLamportTimestamp(vc.getLamportTimestamp());
+							ms1.setLocalTimestamp(currentTimestamp);
+							ms1.setState("ACTIVE");
+						}
+					}
 			}
 		}
 		
@@ -100,6 +232,10 @@ public class MemberStateMonitor {
 		// the only required step is to check if all records from member state table are in
 		// vector clock table (if not number of records in vector clock table is smaller than
 		// the number in member state table)
+		// 
+		// this is not exactly the case, because other member could see some neighbor as 
+		// ACTIVE while the current as INACTIVE. If other member Lamport timestamp is smaller
+		// than of the current no insert or update happens.
 		////////////////////////////////////////////////////////////////////////////////////
 		
 		if(insertMemberState) {
@@ -130,7 +266,9 @@ public class MemberStateMonitor {
 		}
 		
 		// there is case when one member state is INACTIVE, but in received vector clock  
-		// it is present (hence not inserted at the update stage)
+		// it is present (hence not inserted at the update stage). 
+		// Important: received value of Lamport timestamp for INACTIVE member state is
+		//            smaller than Lamport timestamp of member state itself.
 		boolean allVCsInMST = true;
 		for(VectorClock vc: vectorClockTable.getTable()) {
 			// find current vector clock in member state table 
@@ -155,6 +293,7 @@ public class MemberStateMonitor {
 			table.addSeenBy(memberId);
 		}
 		
+		logger.info("Member state: " + table.toString());
 	}
 	
 	/**

@@ -12,13 +12,13 @@ public class TimeoutConnectionManager implements Runnable {
 	public void run() {
 		for(;;) {
 			try {
-				Thread.sleep(60_000);
+				Thread.sleep(600_000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
-			monitor.inactivateMember(System.currentTimeMillis(), 60_000);
+			monitor.inactivateMember(System.currentTimeMillis(), 600_000);
 		}
 	}
 
