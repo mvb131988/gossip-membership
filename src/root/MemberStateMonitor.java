@@ -107,12 +107,15 @@ public class MemberStateMonitor {
 		}
 		
 		////////////////////////////////////////////////////////////////////////////////////
-		// all entries from vectorClockTable are present in memberStateTable and are ACTIVE
-		// because all of them either inserted or updated in the previous step.
-		// 
+		// all entries from vectorClockTable are present in memberStateTable. Entry from
+		// vectorClockTable could be inserted in memberStateTable, value of memberStateTable
+		// could be updated if ACTIVE or nothing is happening if member is INATIVE and is
+		// waiting to be removed.
+		//
 		// the only required step is to check if all records from member state table are in
 		// vector clock table (if not number of records in vector clock table is smaller than
-		// the number in member state table)
+		// the number in member state table and hence two members have different view on 
+		// cluster structure)
 		////////////////////////////////////////////////////////////////////////////////////
 		
 		if(insertMemberState) {
@@ -142,26 +145,7 @@ public class MemberStateMonitor {
 			}
 		}
 		
-		// there is case when one member state is INACTIVE, but in received vector clock  
-		// it is present (hence not inserted at the update stage)
-		boolean allVCsInMST = true;
-//		for(VectorClock vc: vectorClockTable.getTable()) {
-//			// find current vector clock in member state table 
-//			boolean vcFound = false;
-//			for(MemberState ms: table.getTable()) {
-//				if(vc.getMemberId().equals(ms.getMemberId()) && ms.getState().equals("ACTIVE")) {
-//					vcFound = true;
-//					break;
-//				}
-//			}
-//			
-//			if (!vcFound) {
-//				allVCsInMST = false;
-//				break;
-//			}
-//		}
-		
-		if(allMSsInVCT && allVCsInMST) {
+		if(allMSsInVCT) {
 			table.addSeenBy(senderMember);
 		} else {
 			table.resetSeenBy(currentTimestamp);
