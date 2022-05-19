@@ -41,7 +41,8 @@ public class GossipSender implements Runnable {
 						ObjectOutputStream out = new ObjectOutputStream(bos)) 
 				{
 					long timestamp = System.currentTimeMillis();
-					VectorClockTable vct = monitor.updateMemberStateAndGetVectorClockTable(timestamp);
+					VectorClockTable vct = 
+							monitor.updateMemberStateAndGetVectorClockTable(timestamp);
 					GossipMessage gm = new GossipMessage(vct);
 					
 					out.writeObject(gm);

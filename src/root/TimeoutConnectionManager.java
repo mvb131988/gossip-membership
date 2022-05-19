@@ -19,6 +19,7 @@ public class TimeoutConnectionManager implements Runnable {
 			}
 			
 			monitor.inactivateMember(System.currentTimeMillis(), 60_000);
+			monitor.removeMember(System.currentTimeMillis(), 60_000);
 		}
 	}
 

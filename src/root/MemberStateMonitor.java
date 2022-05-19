@@ -1,9 +1,13 @@
 package root;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MemberStateMonitor {
 
 	private String memberId;
 	private MemberStateTable table;
+	private LamportTimestampOperation lto;
 	
 	public MemberStateMonitor() {
 		
@@ -64,6 +68,12 @@ public class MemberStateMonitor {
 					   String senderMember, 
 					   long currentTimestamp) 
 	{
+		for(MemberState ms: table.getTable()) {
+			if(ms.getMemberId().equals(senderMember) && ms.getState().equals("INACTIVE")) {
+				return;
+			}
+		}
+		
 		updateMemberState(currentTimestamp);
 
 		boolean insertMemberState = false;
@@ -85,7 +95,9 @@ public class MemberStateMonitor {
 						 );
 				insertMemberState = true;
 			} else {
-				if(ms1.getLamportTimestamp() < vc.getLamportTimestamp()) {
+				if(ms1.getState().equals("ACTIVE") && 
+				   ms1.getLamportTimestamp() < vc.getLamportTimestamp()) 
+				{
 					ms1.setLamportTimestamp(vc.getLamportTimestamp());
 					ms1.setLocalTimestamp(currentTimestamp);
 					ms1.setState("ACTIVE");
@@ -103,7 +115,7 @@ public class MemberStateMonitor {
 		////////////////////////////////////////////////////////////////////////////////////
 		
 		if(insertMemberState) {
-			table.resetSeenBy();
+			table.resetSeenBy(currentTimestamp);
 			table.addSeenBy(memberId);
 			return;
 		}
@@ -132,31 +144,32 @@ public class MemberStateMonitor {
 		// there is case when one member state is INACTIVE, but in received vector clock  
 		// it is present (hence not inserted at the update stage)
 		boolean allVCsInMST = true;
-		for(VectorClock vc: vectorClockTable.getTable()) {
-			// find current vector clock in member state table 
-			boolean vcFound = false;
-			for(MemberState ms: table.getTable()) {
-				if(vc.getMemberId().equals(ms.getMemberId()) && ms.getState().equals("ACTIVE")) {
-					vcFound = true;
-					break;
-				}
-			}
-			
-			if (!vcFound) {
-				allVCsInMST = false;
-				break;
-			}
-		}
+//		for(VectorClock vc: vectorClockTable.getTable()) {
+//			// find current vector clock in member state table 
+//			boolean vcFound = false;
+//			for(MemberState ms: table.getTable()) {
+//				if(vc.getMemberId().equals(ms.getMemberId()) && ms.getState().equals("ACTIVE")) {
+//					vcFound = true;
+//					break;
+//				}
+//			}
+//			
+//			if (!vcFound) {
+//				allVCsInMST = false;
+//				break;
+//			}
+//		}
 		
 		if(allMSsInVCT && allVCsInMST) {
 			table.addSeenBy(senderMember);
 		} else {
-			table.resetSeenBy();
+			table.resetSeenBy(currentTimestamp);
 			table.addSeenBy(memberId);
 		}
 		
 	}
 	
+	//TODO: move to MemberStateTable
 	/**
 	 * Inactivates members that are currently ACTIVE but no healthcheck/gossip messages
 	 * received within the timeout (since last message).
@@ -172,9 +185,21 @@ public class MemberStateMonitor {
 			   state.getLocalTimestamp() + timeout < timestamp) 
 			{
 				state.setState("INACTIVE");
-				table.resetSeenBy();
+				table.resetSeenBy(timestamp);
 				table.addSeenBy(memberId);
 			}
+		}
+	}
+	
+	public synchronized void removeMember(long timestamp, long timeout) {
+		if(table.getLastResetSeenByMembers() + timeout < timestamp) {
+			List<MemberState> copy = new ArrayList<>();
+			for(MemberState state: table.getTable()) {
+				if(state.getState().equals("ACTIVE")) {
+					copy.add(state);
+				}
+			}
+			table.setTable(copy);
 		}
 	}
 	
