@@ -7,7 +7,7 @@ public class MemberStateMonitor {
 
 	private String memberId;
 	private MemberStateTable table;
-	private LamportTimestampOperation lto;
+	private LamportTimestampOperator lto;
 	
 	public MemberStateMonitor() {
 		
@@ -16,6 +16,7 @@ public class MemberStateMonitor {
 	public MemberStateMonitor(String memberId) {
 		super();
 		this.memberId = memberId;
+		this.lto = new LamportTimestampOperator(100);
 		this.table = new MemberStateTable();
 		this.table.add(new MemberState(this.memberId, 1, System.currentTimeMillis(), "ACTIVE"));
 		this.table.addSeenBy(memberId);
@@ -39,7 +40,7 @@ public class MemberStateMonitor {
 	private void updateMemberState(long currentTimestamp) {
 		for (MemberState state : table.getTable()) {
 			if (state.getMemberId().equals(memberId)) {
-				state.setLamportTimestamp(state.getLamportTimestamp() + 1);
+				state.setLamportTimestamp(lto.next(state.getLamportTimestamp()));
 				state.setLocalTimestamp(currentTimestamp);
 			}
 		}
@@ -96,7 +97,7 @@ public class MemberStateMonitor {
 				insertMemberState = true;
 			} else {
 				if(ms1.getState().equals("ACTIVE") && 
-				   ms1.getLamportTimestamp() < vc.getLamportTimestamp()) 
+				   lto.compare(ms1.getLamportTimestamp(), vc.getLamportTimestamp()) == -1) 
 				{
 					ms1.setLamportTimestamp(vc.getLamportTimestamp());
 					ms1.setLocalTimestamp(currentTimestamp);
