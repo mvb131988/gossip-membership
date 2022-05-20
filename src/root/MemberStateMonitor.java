@@ -112,10 +112,10 @@ public class MemberStateMonitor {
 		// could be updated if ACTIVE or nothing is happening if member is INATIVE and is
 		// waiting to be removed.
 		//
-		// the only required step is to check if all records from member state table are in
-		// vector clock table (if not number of records in vector clock table is smaller than
-		// the number in member state table and hence two members have different view on 
-		// cluster structure)
+		// here goes check if all records from member state table are in vector clock table 
+		// and vice versa (if not number of records in vector clock table is smaller than
+		// the number in member state table (or opposite) and hence two members have 
+		// different view on cluster structure)
 		////////////////////////////////////////////////////////////////////////////////////
 		
 		if(insertMemberState) {

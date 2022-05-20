@@ -307,6 +307,55 @@ public class MemberStateMonitorTest {
 	}
 	
 	@Test
+	public void updateMembersState6() throws NoSuchFieldException, 
+											 SecurityException, 
+											 IllegalArgumentException, 
+											 IllegalAccessException 
+	{
+		MemberStateTable mst = new MemberStateTable();
+		mst.add(new MemberState("member1", 15, 0, "INACTIVE"));
+		mst.add(new MemberState("member2", 24, 0, "ACTIVE"));
+		mst.add(new MemberState("member3", 17, 0, "ACTIVE"));
+		mst.addSeenBy("member2");
+		mst.addSeenBy("member3");
+		
+		MemberStateMonitor msm = new MemberStateMonitor();
+		LamportTimestampOperator lto = new LamportTimestampOperator(100);
+		
+		setPrivateFieldValue(msm, "memberId", "member2");
+		setPrivateFieldValue(msm, "table", mst);
+		setPrivateFieldValue(msm, "lto", lto);
+		
+		long timestamp = System.currentTimeMillis();
+		
+		VectorClockTable vct = new VectorClockTable();
+		vct.add(new VectorClock("member1", 3));
+		vct.addSeenBy("member1");
+		
+		String senderMember = "member1";
+		msm.updateMembersState(vct, senderMember, timestamp);
+		
+		assertAll("mst",
+				() -> assertEquals(mst.getTable().get(0).getMemberId(), "member1"),
+				() -> assertEquals(mst.getTable().get(0).getLamportTimestamp(), 15),
+				() -> assertEquals(mst.getTable().get(0).getLocalTimestamp(), 0),
+				() -> assertEquals(mst.getTable().get(0).getState(), "INACTIVE"),
+				() -> assertEquals(mst.getTable().get(1).getMemberId(), "member2"),
+				() -> assertEquals(mst.getTable().get(1).getLamportTimestamp(), 24),
+				() -> assertEquals(mst.getTable().get(1).getLocalTimestamp(), 0),
+				() -> assertEquals(mst.getTable().get(1).getState(), "ACTIVE"),
+				() -> assertEquals(mst.getTable().get(2).getMemberId(), "member3"),
+				() -> assertEquals(mst.getTable().get(2).getLamportTimestamp(), 17),
+				() -> assertEquals(mst.getTable().get(2).getLocalTimestamp(), 0),
+				() -> assertEquals(mst.getTable().get(2).getState(), "ACTIVE"));
+		
+		Set<String> targetSeenBy = Set.of("member2", "member3");
+		
+		assertTrue(mst.getSeenByMembers().containsAll(targetSeenBy));
+		assertTrue(targetSeenBy.containsAll(mst.getSeenByMembers()));
+	}
+	
+	@Test
 	public void testInactivateMember1() throws NoSuchFieldException, 
 											  SecurityException, 
 											  IllegalArgumentException, 
