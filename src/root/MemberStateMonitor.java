@@ -145,7 +145,26 @@ public class MemberStateMonitor {
 			}
 		}
 		
-		if(allMSsInVCT) {
+		// there is case when one member state is INACTIVE, but in received vector clock  
+		// it is present (hence not inserted at the update stage)
+		boolean allVCsInMST = true;
+		for(VectorClock vc: vectorClockTable.getTable()) {
+			// find current vector clock in member state table 
+			boolean vcFound = false;
+			for(MemberState ms: table.getTable()) {
+				if(vc.getMemberId().equals(ms.getMemberId()) && ms.getState().equals("ACTIVE")) {
+					vcFound = true;
+					break;
+				}
+			}
+			
+			if (!vcFound) {
+				allVCsInMST = false;
+				break;
+			}
+		}
+		
+		if(allMSsInVCT && allVCsInMST) {
 			table.addSeenBy(senderMember);
 		} else {
 			table.resetSeenBy(currentTimestamp);
@@ -170,6 +189,7 @@ public class MemberStateMonitor {
 			   state.getLocalTimestamp() + timeout < timestamp) 
 			{
 				state.setState("INACTIVE");
+				state.setLocalTimestamp(timestamp);
 				table.resetSeenBy(timestamp);
 				table.addSeenBy(memberId);
 			}
@@ -177,15 +197,20 @@ public class MemberStateMonitor {
 	}
 	
 	public synchronized void removeMember(long timestamp, long timeout) {
-		if(table.getLastResetSeenByMembers() + timeout < timestamp) {
-			List<MemberState> copy = new ArrayList<>();
-			for(MemberState state: table.getTable()) {
-				if(state.getState().equals("ACTIVE")) {
-					copy.add(state);
-				}
+		List<MemberState> copy = new ArrayList<>();
+		for (MemberState state : table.getTable()) {
+			if (!state.getState().equals("ACTIVE") && 
+				 state.getLocalTimestamp() + timeout < timestamp) 
+			{
+				continue;
 			}
-			table.setTable(copy);
+			copy.add(state);
 		}
+		if (copy.size() != table.getTable().size()) {
+			table.resetSeenBy(timestamp);
+			table.addSeenBy(memberId);
+		}
+		table.setTable(copy);
 	}
 	
 	/**

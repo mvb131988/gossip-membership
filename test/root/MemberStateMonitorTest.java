@@ -296,7 +296,7 @@ public class MemberStateMonitorTest {
 				() -> assertEquals(mst.getTable().get(2).getLocalTimestamp(), timestamp),
 				() -> assertEquals(mst.getTable().get(2).getState(), "ACTIVE"));
 		
-		Set<String> targetSeenBy = Set.of("member2", "member3");
+		Set<String> targetSeenBy = Set.of("member2");
 		
 		//TODO: seenByMembers from vector clock table must me merged to member state 
 		//		table seenByMembers
@@ -343,7 +343,7 @@ public class MemberStateMonitorTest {
 				() -> assertEquals(mst.getTable().get(0).getState(), "ACTIVE"),
 				() -> assertEquals(mst.getTable().get(1).getMemberId(), "member2"),
 				() -> assertEquals(mst.getTable().get(1).getLamportTimestamp(), 5),
-				() -> assertEquals(mst.getTable().get(1).getLocalTimestamp(), timestamp - 25_000),
+				() -> assertEquals(mst.getTable().get(1).getLocalTimestamp(), timestamp),
 				() -> assertEquals(mst.getTable().get(1).getState(), "INACTIVE"),
 				() -> assertEquals(mst.getTable().get(2).getMemberId(), "member3"),
 				() -> assertEquals(mst.getTable().get(2).getLamportTimestamp(), 7),
