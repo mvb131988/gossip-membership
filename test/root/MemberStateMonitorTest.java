@@ -516,6 +516,6 @@ public class MemberStateMonitorTest {
 		Field f = o.getClass().getDeclaredField(fName);
 		f.setAccessible(true);
 		f.set(o, v);
-		f.setAccessible(true);
+		f.setAccessible(false);
 	}
 }

@@ -196,6 +196,12 @@ public class MemberStateMonitor {
 		}
 	}
 	
+	/**
+	 * Removes INACTIVE member, when it stays INACTIVE longer than timeout.
+	 * 
+	 * @param timestamp - timestamp of the running member
+	 * @param timeout - during timeout duration member is allowed to stay INACTIVE 
+	 */
 	public synchronized void removeMember(long timestamp, long timeout) {
 		List<MemberState> copy = new ArrayList<>();
 		for (MemberState state : table.getTable()) {

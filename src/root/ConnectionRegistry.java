@@ -33,7 +33,7 @@ public class ConnectionRegistry {
 	 * @param key - hostname of the member who connects to the current
 	 * @param in - socket for the given key
 	 */
-	public void registerInbound(String key, Socket in) {
+	public synchronized void registerInbound(String key, Socket in) {
 		MemberLink ml = registry.get(key);
 		if(ml == null) {
 			ml = new MemberLink();
@@ -49,7 +49,7 @@ public class ConnectionRegistry {
 	 * @param key - hostname of the member where the current connects
 	 * @param out - socket for the given key
 	 */
-	public void registerOutbound(String key, Socket out) {
+	public synchronized void registerOutbound(String key, Socket out) {
 		MemberLink ml = registry.get(key);
 		if(ml == null) {
 			ml = new MemberLink();
@@ -64,7 +64,7 @@ public class ConnectionRegistry {
 	 * 
 	 * @param key - member link name (host:port name)
 	 */
-	public void removeConnection(String key) {
+	public synchronized void removeConnection(String key) {
 		MemberLink ml = registry.get(key);
 		if(ml != null) {
 			try {
@@ -87,7 +87,13 @@ public class ConnectionRegistry {
 		} 
 	}
 	
-	public boolean existOutbound(String key) {
+	/**
+	 * Checks if for given member exists outbound connection 
+	 * 
+	 * @param key - member id
+	 * @return true if outbound connection exists, false otherwise
+	 */
+	public synchronized boolean existOutbound(String key) {
 		return registry.get(key) != null && registry.get(key).getOutboundConnection() != null;
 	}
 	
@@ -106,7 +112,7 @@ public class ConnectionRegistry {
 	 * 
 	 * @return next inbound connection or null if there are no initialized member links. 
 	 */
-	public Member nextInbound() {
+	public synchronized Member nextInbound() {
 		Member m = null;
 		int lookupCounter = 0;
 		while (lookupCounter < inboundQueue.size() && inboundQueue.size() > 0) {
@@ -131,7 +137,7 @@ public class ConnectionRegistry {
 	 * 
 	 * @return @return next outbound connection or null if there are no initialized member links.
 	 */
-	public Member nextOutbound() {
+	public synchronized Member nextOutbound() {
 		Member m = null;
 		int lookupCounter = 0;
 		while(lookupCounter < outboundQueue.size() && outboundQueue.size() > 0) {

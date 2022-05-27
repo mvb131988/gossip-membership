@@ -1039,7 +1039,7 @@ public class ConnectionRegistryTest {
 		Field f = o.getClass().getDeclaredField(fName);
 		f.setAccessible(true);
 		f.set(o, v);
-		f.setAccessible(true);
+		f.setAccessible(false);
 	}
 	
 	private Object getPrivateFieldValue(Object o, String fName) 
@@ -1051,7 +1051,7 @@ public class ConnectionRegistryTest {
 		Field f = o.getClass().getDeclaredField(fName);
 		f.setAccessible(true);
 		Object v = f.get(o);
-		f.setAccessible(true);
+		f.setAccessible(false);
 		return v;
 	}
 	
