@@ -58,3 +58,4 @@ START 2 NODES LOCALLY:
 + InboundConnectionManager dies on error
 + move timeout in property file
 + get cluster state based on seenMembersBy last updated timestamp
++ tests fail in maven
