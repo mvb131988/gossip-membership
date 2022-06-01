@@ -27,8 +27,7 @@ public class MemberStateObserver implements Runnable {
 			try {
 				Thread.sleep(30_000);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 			}
 			
 			MemberStateTable table = monitor.copyMemberStateTable();

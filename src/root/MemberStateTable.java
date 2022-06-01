@@ -12,8 +12,6 @@ public class MemberStateTable {
 	// members that saw current state of MemberStateTable
 	private Set<String> seenByMembers;
 	
-	private long lastResetSeenByMembers;
-	
 	public MemberStateTable() {
 		super();
 		this.table = new ArrayList<>();
@@ -28,18 +26,20 @@ public class MemberStateTable {
 		this.table = table;
 	}
 
-	//TODO: encapsulate addSeenBy here, make it private
 	public void add(MemberState vc) {
 		table.add(vc);
 	}
 	
-	public void resetSeenBy(long timestamp) {
+	public void resetSeenBy() {
 		seenByMembers.clear();
-		lastResetSeenByMembers = timestamp;
 	}
 	
 	public void addSeenBy(String memberId) {
 		seenByMembers.add(memberId);
+	}
+	
+	public void addSeenBy(Set<String> membersIds) {
+		seenByMembers.addAll(membersIds);
 	}
 	
 	public Set<String> getSeenByMembers() {
@@ -48,14 +48,6 @@ public class MemberStateTable {
 
 	public void setSeenByMembers(Set<String> seenByMembers) {
 		this.seenByMembers = seenByMembers;
-	}
-	
-	public long getLastResetSeenByMembers() {
-		return lastResetSeenByMembers;
-	}
-
-	public void setLastResetSeenByMembers(long lastResetSeenByMembers) {
-		this.lastResetSeenByMembers = lastResetSeenByMembers;
 	}
 	
 	public VectorClockTable toVectorClockTable() {

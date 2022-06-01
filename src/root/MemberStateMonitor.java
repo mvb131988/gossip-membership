@@ -119,7 +119,7 @@ public class MemberStateMonitor {
 		////////////////////////////////////////////////////////////////////////////////////
 		
 		if(insertMemberState) {
-			table.resetSeenBy(currentTimestamp);
+			table.resetSeenBy();
 			table.addSeenBy(memberId);
 			return;
 		}
@@ -165,15 +165,14 @@ public class MemberStateMonitor {
 		}
 		
 		if(allMSsInVCT && allVCsInMST) {
-			table.addSeenBy(senderMember);
+			table.addSeenBy(vectorClockTable.getSeenByMembers());
 		} else {
-			table.resetSeenBy(currentTimestamp);
+			table.resetSeenBy();
 			table.addSeenBy(memberId);
 		}
 		
 	}
 	
-	//TODO: move to MemberStateTable
 	/**
 	 * Inactivates members that are currently ACTIVE but no healthcheck/gossip messages
 	 * received within the timeout (since last message).
@@ -190,7 +189,7 @@ public class MemberStateMonitor {
 			{
 				state.setState("INACTIVE");
 				state.setLocalTimestamp(timestamp);
-				table.resetSeenBy(timestamp);
+				table.resetSeenBy();
 				table.addSeenBy(memberId);
 			}
 		}
@@ -213,7 +212,7 @@ public class MemberStateMonitor {
 			copy.add(state);
 		}
 		if (copy.size() != table.getTable().size()) {
-			table.resetSeenBy(timestamp);
+			table.resetSeenBy();
 			table.addSeenBy(memberId);
 		}
 		table.setTable(copy);

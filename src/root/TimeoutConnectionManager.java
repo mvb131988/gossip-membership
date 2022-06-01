@@ -1,7 +1,13 @@
 package root;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class TimeoutConnectionManager implements Runnable {
 
+	private static final Logger logger 
+	  = LoggerFactory.getLogger(TimeoutConnectionManager.class);
+	
 	private MemberStateMonitor monitor;
 	
 	public TimeoutConnectionManager(MemberStateMonitor monitor) {
@@ -14,8 +20,7 @@ public class TimeoutConnectionManager implements Runnable {
 			try {
 				Thread.sleep(60_000);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 			}
 			
 			monitor.inactivateMember(System.currentTimeMillis(), 60_000);

@@ -298,10 +298,6 @@ public class MemberStateMonitorTest {
 		
 		Set<String> targetSeenBy = Set.of("member2");
 		
-		//TODO: seenByMembers from vector clock table must me merged to member state 
-		//		table seenByMembers
-		//Set<String> targetSeenBy = Set.of("member1", "member2", "member3");
-		
 		assertTrue(mst.getSeenByMembers().containsAll(targetSeenBy));
 		assertTrue(targetSeenBy.containsAll(mst.getSeenByMembers()));
 	}

@@ -35,9 +35,8 @@ public class Main {
 			ss = new ServerSocket();
 			final InetSocketAddress isa = new InetSocketAddress("0.0.0.0", port);
 			ss.bind(isa);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
 		}
 		
 		logger.info("Starting inbound connection manager thread");
