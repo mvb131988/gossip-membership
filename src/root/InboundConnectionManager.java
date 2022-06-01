@@ -40,9 +40,16 @@ public class InboundConnectionManager implements Runnable {
 				logger.info("Inbound connection [" + host + ":" + port + 
 						" accepts connection from " + member + "]");
 
-				Thread.sleep(5000);
 			} catch (IOException | InterruptedException e) {
 				logger.error(e.getMessage(), e);
+			}
+			
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				logger.error(e.getMessage(), e);
+				logger.error("InboundConnectionManager thread has been terminated");
+				break;
 			}
 		}
 	}

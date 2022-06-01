@@ -67,7 +67,7 @@ public class MemberStateMonitor {
 	public synchronized void 
 	updateMembersState(VectorClockTable vectorClockTable, 
 					   String senderMember, 
-					   long currentTimestamp) 
+					   Long currentTimestamp) 
 	{
 		for(MemberState ms: table.getTable()) {
 			if(ms.getMemberId().equals(senderMember) && ms.getState().equals("INACTIVE")) {

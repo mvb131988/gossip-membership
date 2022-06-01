@@ -59,3 +59,4 @@ START 2 NODES LOCALLY:
 + move timeout in property file
 + get cluster state based on seenMembersBy last updated timestamp
 + tests fail in maven
++ rename hostPort to memberId

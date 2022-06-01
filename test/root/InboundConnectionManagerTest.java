@@ -35,6 +35,9 @@ public class InboundConnectionManagerTest {
 
 		Thread.sleep(1000);
 		assertFalse(t.getState().equals(State.TERMINATED));
+		
+		t.interrupt();
+		t.join();
 	}
 	
 	@Test
