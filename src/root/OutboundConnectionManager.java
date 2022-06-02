@@ -22,15 +22,19 @@ public class OutboundConnectionManager implements Runnable {
 	
 	private ConnectionRegistry cr;
 	
+	private long timeout;
+	
 	public OutboundConnectionManager(List<InetSocketAddress> members, 
 									 String host, 
 									 int port,
-									 ConnectionRegistry cr) 
+									 ConnectionRegistry cr,
+									 long timeout) 
 	{
 		this.members = members;
 		this.host = host;
 		this.port = port;
 		this.cr = cr;
+		this.timeout = timeout;
 	}
 	
 	@Override
@@ -39,7 +43,7 @@ public class OutboundConnectionManager implements Runnable {
 			maintainOutboundConnections();
 
 			try {
-				Thread.sleep(20000);
+				Thread.sleep(timeout);
 			} catch (InterruptedException e) {
 				logger.error(e.getMessage(), e);
 			}

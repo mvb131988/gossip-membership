@@ -21,6 +21,12 @@ import org.mockito.ArgumentCaptor;
 
 public class OutboundConnectionManagerTest {
 
+	private long timeout;
+	
+	public OutboundConnectionManagerTest() {
+		this.timeout = AppPropertiesTest.connectionOutboundFrequency();
+	}
+	
 	@Test
 	public void testMaintainOutboundConnection1() throws IOException, 
 													 IllegalAccessException, 
@@ -41,7 +47,7 @@ public class OutboundConnectionManagerTest {
 		members.add(new InetSocketAddress("localhost", 8082));
 		
 		OutboundConnectionManager icm = 
-				new OutboundConnectionManager(members, "localhost", 8082, cr);
+				new OutboundConnectionManager(members, "localhost", 8082, cr, timeout);
 		
 		ArgumentCaptor<String> arg1= ArgumentCaptor.forClass(String.class);
 		Method m = icm.getClass().getDeclaredMethod("maintainOutboundConnections", 
@@ -75,7 +81,7 @@ public class OutboundConnectionManagerTest {
 		members.add(new InetSocketAddress("localhost", 8082));
 		
 		OutboundConnectionManager icm = 
-				new OutboundConnectionManager(members, "localhost", 8082, cr);
+				new OutboundConnectionManager(members, "localhost", 8082, cr, timeout);
 		
 		Method m = icm.getClass().getDeclaredMethod("maintainOutboundConnections", 
 													(Class<?>[]) null);
@@ -103,7 +109,7 @@ public class OutboundConnectionManagerTest {
 		members.add(new InetSocketAddress("localhost", 8082));
 		
 		OutboundConnectionManager icm = 
-				new OutboundConnectionManager(members, "localhost", 8082, cr);
+				new OutboundConnectionManager(members, "localhost", 8082, cr, timeout);
 		
 		Method m = icm.getClass().getDeclaredMethod("maintainOutboundConnections", 
 													(Class<?>[]) null);
@@ -129,7 +135,7 @@ public class OutboundConnectionManagerTest {
 		members.add(new InetSocketAddress("localhost", 8082));
 		
 		OutboundConnectionManager icm = 
-				new OutboundConnectionManager(members, "localhost", 8082, cr);
+				new OutboundConnectionManager(members, "localhost", 8082, cr, timeout);
 		
 		Method m = icm.getClass().getDeclaredMethod("maintainOutboundConnections", 
 													(Class<?>[]) null);

@@ -20,15 +20,19 @@ public class InboundConnectionManager implements Runnable {
 	
 	private ConnectionRegistry cr;
 	
+	private long timeout;
+	
 	public InboundConnectionManager(ServerSocket ss, 
 									String host, 
 									int port, 
-									ConnectionRegistry cr) 
+									ConnectionRegistry cr,
+									long timeout) 
 	{
 		this.ss = ss;
 		this.host = host;
 		this.port = port;
 		this.cr = cr;
+		this.timeout = timeout;
 	}
 	
 	@Override
@@ -45,7 +49,7 @@ public class InboundConnectionManager implements Runnable {
 			}
 			
 			try {
-				Thread.sleep(5000);
+				Thread.sleep(timeout);
 			} catch (InterruptedException e) {
 				logger.error(e.getMessage(), e);
 				logger.error("InboundConnectionManager thread has been terminated");

@@ -22,6 +22,12 @@ import org.mockito.ArgumentCaptor;
 
 public class GossipReceiverTest {
 
+	private long timeout;
+	
+	public GossipReceiverTest() {
+		this.timeout = AppPropertiesTest.gossipReceiveFrequency();
+	}
+	
 	@Test
 	public void testReceive1() throws IllegalAccessException, 
 									  IllegalArgumentException, 
@@ -41,7 +47,7 @@ public class GossipReceiverTest {
 		
 		MemberStateMonitor msm = mock(MemberStateMonitor.class);
 		
-		GossipReceiver gr = new GossipReceiver("localhost", 8081, cr, msm);
+		GossipReceiver gr = new GossipReceiver("localhost", 8081, cr, msm, timeout);
 		
 		long timestamp = System.currentTimeMillis();
 		
@@ -161,7 +167,7 @@ public class GossipReceiverTest {
 		
 		MemberStateMonitor msm = mock(MemberStateMonitor.class);
 		
-		GossipReceiver gr = new GossipReceiver("localhost", 8081, cr, msm);
+		GossipReceiver gr = new GossipReceiver("localhost", 8081, cr, msm, timeout);
 		
 		long timestamp = System.currentTimeMillis();
 		
@@ -207,7 +213,7 @@ public class GossipReceiverTest {
 		
 		MemberStateMonitor msm = mock(MemberStateMonitor.class);
 		
-		GossipReceiver gr = new GossipReceiver("localhost", 8081, cr, msm);
+		GossipReceiver gr = new GossipReceiver("localhost", 8081, cr, msm, timeout);
 		
 		long timestamp = System.currentTimeMillis();
 		
@@ -261,7 +267,7 @@ public class GossipReceiverTest {
 		
 		MemberStateMonitor msm = mock(MemberStateMonitor.class);
 		
-		GossipReceiver gr = new GossipReceiver("localhost", 8081, cr, msm);
+		GossipReceiver gr = new GossipReceiver("localhost", 8081, cr, msm, timeout);
 		
 		long timestamp = System.currentTimeMillis();
 		

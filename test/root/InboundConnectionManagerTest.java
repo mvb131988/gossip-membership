@@ -17,6 +17,12 @@ import org.junit.jupiter.api.Test;
 
 public class InboundConnectionManagerTest {
 
+	private long timeout;
+	
+	public InboundConnectionManagerTest() {
+		this.timeout = AppPropertiesTest.connectionInboundFrequency();
+	}
+	
 	@Test
 	public void testRun() throws IOException, InterruptedException {
 		FailInputStreamAdapter adapter = new FailInputStreamAdapter();
@@ -29,7 +35,7 @@ public class InboundConnectionManagerTest {
 		ConnectionRegistry cr = mock(ConnectionRegistry.class);
 		
 		InboundConnectionManager icm = 
-				new InboundConnectionManager(ssMock, "localhost", 8081, cr);
+				new InboundConnectionManager(ssMock, "localhost", 8081, cr, timeout);
 		Thread t = new Thread(icm);
 		t.start();
 
@@ -57,7 +63,7 @@ public class InboundConnectionManagerTest {
 		
 		ConnectionRegistry cr = mock(ConnectionRegistry.class);
 		
-		InboundConnectionManager icm = new InboundConnectionManager(ssMock, null, 0, cr);
+		InboundConnectionManager icm = new InboundConnectionManager(ssMock, null, 0, cr, timeout);
 		
 		Method m = icm.getClass().getDeclaredMethod("acceptInboundConnection", (Class<?>[]) null);
 		m.setAccessible(true);

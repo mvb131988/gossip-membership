@@ -43,14 +43,16 @@ public class Main {
 		
 		ConnectionRegistry cr = new ConnectionRegistry();
 		
-		InboundConnectionManager icm = new InboundConnectionManager(ss, host, port, cr);
+		long t1 = AppProperties.connectionInboundFrequency();
+		InboundConnectionManager icm = new InboundConnectionManager(ss, host, port, cr, t1);
 		Thread icmt = new Thread(icm);
 		icmt.setName("InboundConnectionManagerThread");
 		icmt.start();
 		
 		logger.info("Starting outbound connection manager thread");
 		
-		OutboundConnectionManager ocm = new OutboundConnectionManager(nodes, host, port, cr);
+		long t2 = AppProperties.connectionOutboundFrequency();
+		OutboundConnectionManager ocm = new OutboundConnectionManager(nodes, host, port, cr, t2);
 		Thread ocmt = new Thread(ocm);
 		ocmt.setName("OutboundConnectionManagerThread");
 		ocmt.start();
@@ -59,28 +61,32 @@ public class Main {
 		
 		logger.info("Starting gossip sender thread");
 		
-		GossipSender gs = new GossipSender(host, port, cr, msm);
+		long t3 = AppProperties.gossipSendFrequency();
+		GossipSender gs = new GossipSender(host, port, cr, msm, t3);
 		Thread gst = new Thread(gs);
 		gst.setName("GossipSenderThread");
 		gst.start();
 		
 		logger.info("Starting gossip receiver thread");
 		
-		GossipReceiver gr = new GossipReceiver(host, port, cr, msm);
+		long t4 = AppProperties.gossipReceiveFrequency();
+		GossipReceiver gr = new GossipReceiver(host, port, cr, msm, t4);
 		Thread grt = new Thread(gr);
 		grt.setName("GossipRecevierThread");
 		grt.start();
 		
 		logger.info("Starting timeout connection thread");
 		
-		TimeoutConnectionManager tcm = new TimeoutConnectionManager(msm);
-		Thread tcmt = new Thread(tcm);
+		long t5 = AppProperties.memberstatetableChangeFrequency();
+		MemberStateManager msma = new MemberStateManager(msm, t5);
+		Thread tcmt = new Thread(msma);
 		tcmt.setName("TimeoutConnectionManager");
 		tcmt.start();
 		
 		logger.info("Member state observer thread");
 		
-		MemberStateObserver mso = new MemberStateObserver(host, port, msm);
+		long t6 = AppProperties.memberstatetablePollFrequency();
+		MemberStateObserver mso = new MemberStateObserver(host, port, msm, t6);
 		Thread msot = new Thread(mso);
 		msot.setName("MemberStateObserver");
 		msot.start();

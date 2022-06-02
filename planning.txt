@@ -55,8 +55,5 @@ START 2 NODES LOCALLY:
    	 java -jar gossip-membership.jar 8082
 =========================================================================================
 
-+ InboundConnectionManager dies on error
-+ move timeout in property file
 + get cluster state based on seenMembersBy last updated timestamp
-+ tests fail in maven
 + rename hostPort to memberId

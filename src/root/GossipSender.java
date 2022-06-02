@@ -21,15 +21,19 @@ public class GossipSender implements Runnable {
 	
 	private MemberStateMonitor monitor;
 	
+	private long timeout;
+	
 	public GossipSender(String host, 
 						int port, 
 						ConnectionRegistry cr, 
-						MemberStateMonitor monitor) 
+						MemberStateMonitor monitor,
+						long timeout) 
 	{
 		this.cr = cr;
 		this.host = host;
 		this.port = port;
 		this.monitor = monitor;
+		this.timeout = timeout;
 	}
 	
 	@Override
@@ -39,7 +43,7 @@ public class GossipSender implements Runnable {
 			sendVectorClock(timestamp);
 			
 			try {
-				Thread.sleep(2000);
+				Thread.sleep(timeout);
 			} catch (InterruptedException e) {
 				logger.error(e.getMessage(), e);
 			}

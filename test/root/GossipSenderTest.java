@@ -22,6 +22,12 @@ import org.junit.jupiter.api.Test;
 
 public class GossipSenderTest {
 
+	private long timeout;
+	
+	public GossipSenderTest() {
+		this.timeout = AppPropertiesTest.gossipSendFrequency();
+	}
+	
 	@Test
 	public void testSendVectorClock1() throws IOException, 
 											 IllegalAccessException, 
@@ -46,7 +52,7 @@ public class GossipSenderTest {
 		MemberStateMonitor msm = mock(MemberStateMonitor.class);
 		when(msm.updateMemberStateAndGetVectorClockTable(timestamp)).thenReturn(vct);
 		
-		GossipSender gs = new GossipSender("localhost", 8082, cr, msm);
+		GossipSender gs = new GossipSender("localhost", 8082, cr, msm, timeout);
 		
 		Method md = gs.getClass().getDeclaredMethod("sendVectorClock", Long.class);
 		md.setAccessible(true);
@@ -136,7 +142,7 @@ public class GossipSenderTest {
 		MemberStateMonitor msm = mock(MemberStateMonitor.class);
 		when(msm.updateMemberStateAndGetVectorClockTable(timestamp)).thenReturn(vct);
 		
-		GossipSender gs = new GossipSender("localhost", 8082, cr, msm);
+		GossipSender gs = new GossipSender("localhost", 8082, cr, msm, timeout);
 		
 		Method md = gs.getClass().getDeclaredMethod("sendVectorClock", Long.class);
 		md.setAccessible(true);
@@ -169,7 +175,7 @@ public class GossipSenderTest {
 		MemberStateMonitor msm = mock(MemberStateMonitor.class);
 		when(msm.updateMemberStateAndGetVectorClockTable(timestamp)).thenReturn(null);
 		
-		GossipSender gs = new GossipSender("localhost", 8082, cr, msm);
+		GossipSender gs = new GossipSender("localhost", 8082, cr, msm, timeout);
 		
 		Method md = gs.getClass().getDeclaredMethod("sendVectorClock", Long.class);
 		md.setAccessible(true);

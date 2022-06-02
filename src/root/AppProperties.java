@@ -32,4 +32,34 @@ public class AppProperties {
 		return l;
 	}
 
+	public static Long connectionInboundFrequency() {
+		return Long.parseLong(
+				ResourceBundle.getBundle("app").getString("connection.inbound.frequency"));
+	}
+	
+	public static Long connectionOutboundFrequency() {
+		return Long.parseLong(
+				ResourceBundle.getBundle("app").getString("connection.outbound.frequency"));
+	}
+	
+	public static Long gossipSendFrequency() {
+		return Long.parseLong(
+				ResourceBundle.getBundle("app").getString("gossip.send.frequency"));
+	}
+
+	public static Long gossipReceiveFrequency() {
+		return Long.parseLong(
+				ResourceBundle.getBundle("app").getString("gossip.receive.frequency"));
+	}
+	
+	public static Long memberstatetableChangeFrequency() {
+		return Long.parseLong(
+				ResourceBundle.getBundle("app").getString("memberstatetable.change.frequency"));
+	}
+	
+	public static Long memberstatetablePollFrequency() {
+		return Long.parseLong(
+				ResourceBundle.getBundle("app").getString("memberstatetable.poll.frequency"));
+	}
+	
 }
