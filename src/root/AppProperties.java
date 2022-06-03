@@ -62,4 +62,9 @@ public class AppProperties {
 				ResourceBundle.getBundle("app").getString("memberstatetable.poll.frequency"));
 	}
 	
+	public static Long clusterstateConvergencePeriod() {
+		return Long.parseLong(
+				ResourceBundle.getBundle("app").getString("clusterstate.convergence.period"));
+	}
+	
 }

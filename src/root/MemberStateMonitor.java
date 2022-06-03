@@ -237,6 +237,8 @@ public class MemberStateMonitor {
 			copy.addSeenBy(memberId);
 		}
 		
+		copy.setLastResetTimestamp(table.getLastResetTimestamp());
+		
 		return copy;
 	}
 	

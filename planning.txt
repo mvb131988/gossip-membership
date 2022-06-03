@@ -55,5 +55,4 @@ START 2 NODES LOCALLY:
    	 java -jar gossip-membership.jar 8082
 =========================================================================================
 
-+ get cluster state based on seenMembersBy last updated timestamp
 + rename hostPort to memberId

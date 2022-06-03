@@ -86,7 +86,8 @@ public class Main {
 		logger.info("Member state observer thread");
 		
 		long t6 = AppProperties.memberstatetablePollFrequency();
-		MemberStateObserver mso = new MemberStateObserver(host, port, msm, t6);
+		long cscp = AppProperties.clusterstateConvergencePeriod();
+		MemberStateObserver mso = new MemberStateObserver(host, port, msm, t6, cscp);
 		Thread msot = new Thread(mso);
 		msot.setName("MemberStateObserver");
 		msot.start();

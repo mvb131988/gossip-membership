@@ -12,10 +12,13 @@ public class MemberStateTable {
 	// members that saw current state of MemberStateTable
 	private Set<String> seenByMembers;
 	
+	private long lastResetTimestamp;
+	
 	public MemberStateTable() {
 		super();
 		this.table = new ArrayList<>();
 		this.seenByMembers = new HashSet<>();
+		this.lastResetTimestamp = System.currentTimeMillis();
 	}
 
 	public List<MemberState> getTable() {
@@ -32,6 +35,7 @@ public class MemberStateTable {
 	
 	public void resetSeenBy() {
 		seenByMembers.clear();
+		this.lastResetTimestamp = System.currentTimeMillis();
 	}
 	
 	public void addSeenBy(String memberId) {
@@ -100,6 +104,14 @@ public class MemberStateTable {
 		sb.append("}");
 		
 		return sb.toString();
+	}
+
+	public long getLastResetTimestamp() {
+		return lastResetTimestamp;
+	}
+
+	public void setLastResetTimestamp(long lastResetTimestamp) {
+		this.lastResetTimestamp = lastResetTimestamp;
 	}
 	
 }
