@@ -245,11 +245,11 @@ public class ConnectionRegistryTest {
 		Member m3 = cr.nextInbound();
 		
 		assertAll("members",
-				() -> assertEquals("member1", m1.getHostPort()),
+				() -> assertEquals("member1", m1.getMemberId()),
 				() -> assertEquals(sIn1, m1.getSocket()),
-				() -> assertEquals("member2", m2.getHostPort()),
+				() -> assertEquals("member2", m2.getMemberId()),
 				() -> assertEquals(sIn2, m2.getSocket()),
-				() -> assertEquals("member1", m3.getHostPort()),
+				() -> assertEquals("member1", m3.getMemberId()),
 				() -> assertEquals(sIn1, m3.getSocket()));
 	}
 	
@@ -288,11 +288,11 @@ public class ConnectionRegistryTest {
 		Member m3 = cr.nextInbound();
 		
 		assertAll("members",
-				() -> assertEquals("member1", m1.getHostPort()),
+				() -> assertEquals("member1", m1.getMemberId()),
 				() -> assertEquals(sIn1, m1.getSocket()),
-				() -> assertEquals("member1", m2.getHostPort()),
+				() -> assertEquals("member1", m2.getMemberId()),
 				() -> assertEquals(sIn1, m2.getSocket()),
-				() -> assertEquals("member1", m3.getHostPort()),
+				() -> assertEquals("member1", m3.getMemberId()),
 				() -> assertEquals(sIn1, m3.getSocket()));
 	}
 	
@@ -339,11 +339,11 @@ public class ConnectionRegistryTest {
 		Member m3 = cr.nextInbound();
 		
 		assertAll("members",
-				() -> assertEquals("member1", m1.getHostPort()),
+				() -> assertEquals("member1", m1.getMemberId()),
 				() -> assertEquals(sIn1, m1.getSocket()),
-				() -> assertEquals("member3", m2.getHostPort()),
+				() -> assertEquals("member3", m2.getMemberId()),
 				() -> assertEquals(sIn3, m2.getSocket()),
-				() -> assertEquals("member1", m3.getHostPort()),
+				() -> assertEquals("member1", m3.getMemberId()),
 				() -> assertEquals(sIn1, m3.getSocket()));
 	}
 	
@@ -390,11 +390,11 @@ public class ConnectionRegistryTest {
 		Member m3 = cr.nextInbound();
 		
 		assertAll("members",
-				() -> assertEquals("member1", m1.getHostPort()),
+				() -> assertEquals("member1", m1.getMemberId()),
 				() -> assertEquals(sIn1, m1.getSocket()),
-				() -> assertEquals("member2", m2.getHostPort()),
+				() -> assertEquals("member2", m2.getMemberId()),
 				() -> assertEquals(sIn2, m2.getSocket()),
-				() -> assertEquals("member1", m3.getHostPort()),
+				() -> assertEquals("member1", m3.getMemberId()),
 				() -> assertEquals(sIn1, m3.getSocket()));
 	}
 	
@@ -447,13 +447,13 @@ public class ConnectionRegistryTest {
 		Member m4 = cr.nextInbound();
 		
 		assertAll("members",
-				() -> assertEquals("member2", m1.getHostPort()),
+				() -> assertEquals("member2", m1.getMemberId()),
 				() -> assertEquals(sIn2, m1.getSocket()),
-				() -> assertEquals("member2", m2.getHostPort()),
+				() -> assertEquals("member2", m2.getMemberId()),
 				() -> assertEquals(sIn2, m2.getSocket()),
-				() -> assertEquals("member2", m3.getHostPort()),
+				() -> assertEquals("member2", m3.getMemberId()),
 				() -> assertEquals(sIn2, m3.getSocket()),
-				() -> assertEquals("member2", m4.getHostPort()),
+				() -> assertEquals("member2", m4.getMemberId()),
 				() -> assertEquals(sIn2, m4.getSocket()));
 	}
 	
@@ -494,11 +494,11 @@ public class ConnectionRegistryTest {
 		Member m3 = cr.nextInbound();
 		
 		assertAll("members",
-				() -> assertEquals("member1", m1.getHostPort()),
+				() -> assertEquals("member1", m1.getMemberId()),
 				() -> assertEquals(sIn1, m1.getSocket()),
-				() -> assertEquals("member3", m2.getHostPort()),
+				() -> assertEquals("member3", m2.getMemberId()),
 				() -> assertEquals(sIn3, m2.getSocket()),
-				() -> assertEquals("member1", m3.getHostPort()),
+				() -> assertEquals("member1", m3.getMemberId()),
 				() -> assertEquals(sIn1, m3.getSocket()));
 		
 		assertAll("inboundQueue",
@@ -632,11 +632,11 @@ public class ConnectionRegistryTest {
 		Member m3 = cr.nextOutbound();
 		
 		assertAll("members",
-				() -> assertEquals("member1", m1.getHostPort()),
+				() -> assertEquals("member1", m1.getMemberId()),
 				() -> assertEquals(sOut1, m1.getSocket()),
-				() -> assertEquals("member2", m2.getHostPort()),
+				() -> assertEquals("member2", m2.getMemberId()),
 				() -> assertEquals(sOut2, m2.getSocket()),
-				() -> assertEquals("member1", m3.getHostPort()),
+				() -> assertEquals("member1", m3.getMemberId()),
 				() -> assertEquals(sOut1, m3.getSocket()));
 	}
 	
@@ -675,11 +675,11 @@ public class ConnectionRegistryTest {
 		Member m3 = cr.nextOutbound();
 		
 		assertAll("members",
-				() -> assertEquals("member1", m1.getHostPort()),
+				() -> assertEquals("member1", m1.getMemberId()),
 				() -> assertEquals(sOut1, m1.getSocket()),
-				() -> assertEquals("member1", m2.getHostPort()),
+				() -> assertEquals("member1", m2.getMemberId()),
 				() -> assertEquals(sOut1, m2.getSocket()),
-				() -> assertEquals("member1", m3.getHostPort()),
+				() -> assertEquals("member1", m3.getMemberId()),
 				() -> assertEquals(sOut1, m3.getSocket()));
 	}
 	
@@ -726,11 +726,11 @@ public class ConnectionRegistryTest {
 		Member m3 = cr.nextOutbound();
 		
 		assertAll("members",
-				() -> assertEquals("member1", m1.getHostPort()),
+				() -> assertEquals("member1", m1.getMemberId()),
 				() -> assertEquals(sOut1, m1.getSocket()),
-				() -> assertEquals("member3", m2.getHostPort()),
+				() -> assertEquals("member3", m2.getMemberId()),
 				() -> assertEquals(sOut3, m2.getSocket()),
-				() -> assertEquals("member1", m3.getHostPort()),
+				() -> assertEquals("member1", m3.getMemberId()),
 				() -> assertEquals(sOut1, m3.getSocket()));
 	}
 	
@@ -777,11 +777,11 @@ public class ConnectionRegistryTest {
 		Member m3 = cr.nextOutbound();
 		
 		assertAll("members",
-				() -> assertEquals("member1", m1.getHostPort()),
+				() -> assertEquals("member1", m1.getMemberId()),
 				() -> assertEquals(sOut1, m1.getSocket()),
-				() -> assertEquals("member2", m2.getHostPort()),
+				() -> assertEquals("member2", m2.getMemberId()),
 				() -> assertEquals(sOut2, m2.getSocket()),
-				() -> assertEquals("member1", m3.getHostPort()),
+				() -> assertEquals("member1", m3.getMemberId()),
 				() -> assertEquals(sOut1, m3.getSocket()));
 	}
 	
@@ -834,13 +834,13 @@ public class ConnectionRegistryTest {
 		Member m4 = cr.nextOutbound();
 		
 		assertAll("members",
-				() -> assertEquals("member2", m1.getHostPort()),
+				() -> assertEquals("member2", m1.getMemberId()),
 				() -> assertEquals(sOut2, m1.getSocket()),
-				() -> assertEquals("member2", m2.getHostPort()),
+				() -> assertEquals("member2", m2.getMemberId()),
 				() -> assertEquals(sOut2, m2.getSocket()),
-				() -> assertEquals("member2", m3.getHostPort()),
+				() -> assertEquals("member2", m3.getMemberId()),
 				() -> assertEquals(sOut2, m3.getSocket()),
-				() -> assertEquals("member2", m4.getHostPort()),
+				() -> assertEquals("member2", m4.getMemberId()),
 				() -> assertEquals(sOut2, m4.getSocket()));
 	}
 	

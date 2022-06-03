@@ -15,13 +15,11 @@ public class GossipSender implements Runnable {
 	
 	private ConnectionRegistry cr;
 	
-	private String host;
-	
-	private int port;
-	
 	private MemberStateMonitor monitor;
 	
 	private long timeout;
+	
+	private String memberId;
 	
 	public GossipSender(String host, 
 						int port, 
@@ -30,10 +28,9 @@ public class GossipSender implements Runnable {
 						long timeout) 
 	{
 		this.cr = cr;
-		this.host = host;
-		this.port = port;
 		this.monitor = monitor;
 		this.timeout = timeout;
+		this.memberId = host + ":" + port;
 	}
 	
 	@Override
@@ -63,8 +60,8 @@ public class GossipSender implements Runnable {
 				out.writeObject(gm);
 				byte[] output = bos.toByteArray();
 				
-				logger.info("Member " + host + ":" + port + " sends " + output.length + 
-						" bytes to " + m.getHostPort());
+				logger.info("Member " + memberId + " sends " + output.length + 
+						" bytes to " + m.getMemberId());
 				
 				OutputStream os = m.getSocket().getOutputStream();
 				os.write(output.length & 0xff);
@@ -74,11 +71,11 @@ public class GossipSender implements Runnable {
 				
 				os.write(output);
 				
-				logger.info("Member " + host + ":" + port + " sends vector clock {} to " + 
-							m.getHostPort(), gm);
+				logger.info("Member " + memberId + " sends vector clock {} to " + 
+							m.getMemberId(), gm);
 			} catch (IOException e) {
 				logger.error(e.getMessage(), e);
-				cr.removeConnection(m.getHostPort());
+				cr.removeConnection(m.getMemberId());
 			}
 		}
 	}

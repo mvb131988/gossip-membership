@@ -18,54 +18,54 @@ public class ConnectionRegistry {
 	private Map<String, MemberLink> registry = new HashMap<>();
 	
 	// value here is MemberLink name
-	// when MemberLink is created its hostPort value saved here. Then it's retrieved
+	// when MemberLink is created its memberId value saved here. Then it's retrieved
 	// in a round robin manner
 	private Deque<String> inboundQueue  = new LinkedList<>();
 	
 	// value here is MemberLink name
-	// when MemberLink is created its hostPort value saved here. Then it's retrieved
+	// when MemberLink is created its memberId value saved here. Then it's retrieved
 	// in a round robin manner
 	private Deque<String> outboundQueue  = new LinkedList<>();
 	
 	/**
 	 * Register inbound connection
 	 * 
-	 * @param key - hostname of the member who connects to the current
+	 * @param memberId - memberId of the member who connects to the current one
 	 * @param in - socket for the given key
 	 */
-	public synchronized void registerInbound(String key, Socket in) {
-		MemberLink ml = registry.get(key);
+	public synchronized void registerInbound(String memberId, Socket in) {
+		MemberLink ml = registry.get(memberId);
 		if(ml == null) {
 			ml = new MemberLink();
-			registry.put(key, ml);
+			registry.put(memberId, ml);
 		}
-		inboundQueue.add(key);
+		inboundQueue.add(memberId);
 		ml.setInboundConnection(in);
 	}
 	
 	/**
 	 * Register outbound connection.
 	 * 
-	 * @param key - hostname of the member where the current connects
+	 * @param memberId - memberId of the member where the current one connects
 	 * @param out - socket for the given key
 	 */
-	public synchronized void registerOutbound(String key, Socket out) {
-		MemberLink ml = registry.get(key);
+	public synchronized void registerOutbound(String memberId, Socket out) {
+		MemberLink ml = registry.get(memberId);
 		if(ml == null) {
 			ml = new MemberLink();
-			registry.put(key, ml);
+			registry.put(memberId, ml);
 		}
-		outboundQueue.add(key);
+		outboundQueue.add(memberId);
 		ml.setOutboundConnection(out);
 	}
 	
 	/**
 	 * Removes member link, closes both inbound, outbound connections.
 	 * 
-	 * @param key - member link name (host:port name)
+	 * @param memberId - memberId of the removing member link
 	 */
-	public synchronized void removeConnection(String key) {
-		MemberLink ml = registry.get(key);
+	public synchronized void removeConnection(String memberId) {
+		MemberLink ml = registry.get(memberId);
 		if(ml != null) {
 			try {
 				if(ml.getInboundConnection() != null) {
@@ -83,18 +83,19 @@ public class ConnectionRegistry {
 				logger.error(ex.getMessage(), ex);
 			}
 			
-			registry.remove(key);
+			registry.remove(memberId);
 		} 
 	}
 	
 	/**
 	 * Checks if for given member exists outbound connection 
 	 * 
-	 * @param key - member id
+	 * @param memberId - member id if the verifying member link 
 	 * @return true if outbound connection exists, false otherwise
 	 */
-	public synchronized boolean existOutbound(String key) {
-		return registry.get(key) != null && registry.get(key).getOutboundConnection() != null;
+	public synchronized boolean existOutbound(String memberId) {
+		MemberLink ml = registry.get(memberId);
+		return ml != null && ml.getOutboundConnection() != null;
 	}
 	
 	/**
@@ -103,7 +104,7 @@ public class ConnectionRegistry {
 	 * 
 	 * There are two concerns:
 	 * - when MemberLink is removed queue is not cleared immediately. During queue traversal
-	 *   if for the selected hostPort value there is no MemberLink in the registry (this is 
+	 *   if for the selected memberId value there is no MemberLink in the registry (this is 
 	 *   the indicator that MemberLink has been removed) then it's removed from the queue
 	 *   and the next element is chosen and verified.
 	 * - when there is non empty registry, but all MemberLinks are not initialized 
@@ -116,15 +117,15 @@ public class ConnectionRegistry {
 		Member m = null;
 		int lookupCounter = 0;
 		while (lookupCounter < inboundQueue.size() && inboundQueue.size() > 0) {
-			String mlHostPort = inboundQueue.pollFirst();
-			if (registry.get(mlHostPort) != null) {
+			String mlMemberId = inboundQueue.pollFirst();
+			if (registry.get(mlMemberId) != null) {
 				lookupCounter++;
 				
-				inboundQueue.addLast(mlHostPort);
+				inboundQueue.addLast(mlMemberId);
 
-				if (isInitialized(mlHostPort)) {
-					MemberLink ml = registry.get(mlHostPort);
-					m = new Member(mlHostPort, ml.getInboundConnection());
+				if (isInitialized(mlMemberId)) {
+					MemberLink ml = registry.get(mlMemberId);
+					m = new Member(mlMemberId, ml.getInboundConnection());
 					break;
 				}
 			}
@@ -141,15 +142,15 @@ public class ConnectionRegistry {
 		Member m = null;
 		int lookupCounter = 0;
 		while(lookupCounter < outboundQueue.size() && outboundQueue.size() > 0) {
-			String mlHostPort = outboundQueue.pollFirst();
-			if(registry.get(mlHostPort) != null) {
+			String mlMemberId = outboundQueue.pollFirst();
+			if(registry.get(mlMemberId) != null) {
 				lookupCounter++;
 				
-				outboundQueue.addLast(mlHostPort);
+				outboundQueue.addLast(mlMemberId);
 				
-				if(isInitialized(mlHostPort)) {
-					MemberLink ml = registry.get(mlHostPort);
-					m = new Member(mlHostPort, ml.getOutboundConnection());
+				if(isInitialized(mlMemberId)) {
+					MemberLink ml = registry.get(mlMemberId);
+					m = new Member(mlMemberId, ml.getOutboundConnection());
 					break;
 				}
 			}

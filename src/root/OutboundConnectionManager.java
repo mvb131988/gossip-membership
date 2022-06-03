@@ -13,6 +13,9 @@ public class OutboundConnectionManager implements Runnable {
 	private static final Logger logger 
 	  = LoggerFactory.getLogger(OutboundConnectionManager.class);
 	
+	//TODO: instead of real <ip,port> it's possible to use memberId.
+	//		separate class that maps memeberId to <ip,port> could be used here
+	//		to decouple real <ip,port> from gossip-membership module
 	// host names and ports of all known external members (except the current)
 	private List<InetSocketAddress> members;
 	
@@ -23,6 +26,8 @@ public class OutboundConnectionManager implements Runnable {
 	private ConnectionRegistry cr;
 	
 	private long timeout;
+	
+	private String memberId;
 	
 	public OutboundConnectionManager(List<InetSocketAddress> members, 
 									 String host, 
@@ -35,6 +40,7 @@ public class OutboundConnectionManager implements Runnable {
 		this.port = port;
 		this.cr = cr;
 		this.timeout = timeout;
+		this.memberId = host + ":" + port;
 	}
 	
 	@Override
@@ -62,13 +68,12 @@ public class OutboundConnectionManager implements Runnable {
 					Socket s = new Socket(m.getHostName(), m.getPort());
 					cr.registerOutbound(m.getHostName() + ":" + m.getPort(), s);
 					
-					logger.info("Outbound connection [" + host + ":" + port + 
+					logger.info("Outbound connection [" + this.memberId + 
 								" connects to " + m.getHostName() + ":" + m.getPort() + "]");
 					
-					String currentMember = host + ":" + port;
-					byte[] bCurrentMemberNode = currentMember.getBytes();
-					s.getOutputStream().write(bCurrentMemberNode.length);
-					s.getOutputStream().write(bCurrentMemberNode);
+					byte[] bCurrentMemberId = memberId.getBytes();
+					s.getOutputStream().write(bCurrentMemberId.length);
+					s.getOutputStream().write(bCurrentMemberId);
 				} catch (IOException e) {
 					logger.error(e.getMessage(), e);
 				}

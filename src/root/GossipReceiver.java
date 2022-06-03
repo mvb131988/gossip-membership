@@ -14,13 +14,11 @@ public class GossipReceiver implements Runnable {
 
 	private ConnectionRegistry cr;
 	
-	private String host;
-	
-	private int port;
-	
 	private MemberStateMonitor monitor;
 	
 	private long timeout;
+	
+	private String memberId;
 	
 	public GossipReceiver(String host, int port, 
 						  ConnectionRegistry cr, 
@@ -28,8 +26,7 @@ public class GossipReceiver implements Runnable {
 						  long timeout) 
 	{
 		this.cr = cr;
-		this.host = host;
-		this.port = port;
+		this.memberId = host + ":" + port;
 		this.monitor = monitor;
 		this.timeout = timeout;
 	}
@@ -53,8 +50,8 @@ public class GossipReceiver implements Runnable {
 		Member m = cr.nextInbound();
 		if (m != null) {
 
-			logger.info("Member " + host + ":" + port + " checks for incoming messages "
-					+ "from " + m.getHostPort());
+			logger.info("Member " + memberId + " checks for incoming messages "
+					+ "from " + m.getMemberId());
 			
 			byte[] input = null;
 			try {
@@ -68,7 +65,7 @@ public class GossipReceiver implements Runnable {
 				m.getSocket().getInputStream().read(input);
 			} catch (IOException e) {
 				logger.error(e.getMessage(), e);
-				cr.removeConnection(m.getHostPort());
+				cr.removeConnection(m.getMemberId());
 			}
 			
 			// when failure happens input could be left uninitialized
@@ -76,24 +73,24 @@ public class GossipReceiver implements Runnable {
 			// when invoked in logger this leads to NullPointer and to GossipReceiver 
 			// thread death
 			if(input != null) {
-				logger.info("Member " + host + ":" + port + " receives from " + 
-						m.getHostPort() + " " + input.length + " bytes");
+				logger.info("Member " + memberId + " receives from " + 
+						m.getMemberId() + " " + input.length + " bytes");
 				
 				try (ByteArrayInputStream bis = new ByteArrayInputStream(input);
 						ObjectInputStream in = new ObjectInputStream(bis)) {
 					GossipMessage gm = null;
 					gm = (GossipMessage) in.readObject();
 				
-					logger.info("Member " + host + ":" + port + " receives vector clock "
-							+ "{} from " + m.getHostPort(), gm);
+					logger.info("Member " + memberId + " receives vector clock "
+							+ "{} from " + m.getMemberId(), gm);
 					
 					monitor.updateMembersState(gm.getVectorClock(), 
-											   m.getHostPort(), 
+											   m.getMemberId(), 
 											   timestamp);
 					
 				} catch (ClassNotFoundException | IOException e) {
 					logger.error(e.getMessage(), e);
-					cr.removeConnection(m.getHostPort());
+					cr.removeConnection(m.getMemberId());
 				}
 			}
 		}

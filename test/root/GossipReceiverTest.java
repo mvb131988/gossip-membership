@@ -181,8 +181,8 @@ public class GossipReceiverTest {
 		verify(msm, times(0)).updateMembersState(any(), any(), any());
 		verify(cr, times(1)).removeConnection(arg1.capture());
 		
-		String hostPort = arg1.getValue();
-		assertEquals("localhost:8082", hostPort);
+		String memberId = arg1.getValue();
+		assertEquals("localhost:8082", memberId);
 	}
 
 	private static class FailInputStreamAdapter2 extends InputStream {
@@ -227,8 +227,8 @@ public class GossipReceiverTest {
 		verify(msm, times(0)).updateMembersState(any(), any(), any());
 		verify(cr, times(1)).removeConnection(arg1.capture());
 		
-		String hostPort = arg1.getValue();
-		assertEquals("localhost:8082", hostPort);
+		String memberId = arg1.getValue();
+		assertEquals("localhost:8082", memberId);
 	}
 
 	private static class FailInputStreamAdapter3 extends InputStream {

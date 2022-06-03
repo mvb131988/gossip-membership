@@ -14,13 +14,11 @@ public class InboundConnectionManager implements Runnable {
 	
 	private ServerSocket ss;
 	
-	private String host;
-	
-	private int port;
-	
 	private ConnectionRegistry cr;
 	
 	private long timeout;
+	
+	private String memberId;
 	
 	public InboundConnectionManager(ServerSocket ss, 
 									String host, 
@@ -29,20 +27,19 @@ public class InboundConnectionManager implements Runnable {
 									long timeout) 
 	{
 		this.ss = ss;
-		this.host = host;
-		this.port = port;
 		this.cr = cr;
 		this.timeout = timeout;
+		this.memberId = host + ":" + port;
 	}
 	
 	@Override
 	public void run() {
 		for (;;) {
 			try {
-				String member = acceptInboundConnection();
+				String inMemberId = acceptInboundConnection();
 
-				logger.info("Inbound connection [" + host + ":" + port + 
-						" accepts connection from " + member + "]");
+				logger.info("Inbound connection [" + this.memberId + 
+					   " accepts connection from " + inMemberId + "]");
 
 			} catch (IOException | InterruptedException e) {
 				logger.error(e.getMessage(), e);
@@ -63,14 +60,13 @@ public class InboundConnectionManager implements Runnable {
 
 		int length = clientSocket.getInputStream().read();
 
-		// host name of the connected member
-		byte[] bMember = new byte[length];
-		clientSocket.getInputStream().read(bMember);
-		String member = new String(bMember);
+		byte[] bMemberId = new byte[length];
+		clientSocket.getInputStream().read(bMemberId);
+		String memberId = new String(bMemberId);
 		
-		cr.registerInbound(member, clientSocket);
+		cr.registerInbound(memberId, clientSocket);
 		
-		return member;
+		return memberId;
 	}
 
 }

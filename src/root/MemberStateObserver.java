@@ -11,20 +11,17 @@ public class MemberStateObserver implements Runnable {
 	private static final Logger logger 
 	  = LoggerFactory.getLogger(MemberStateObserver.class);
 	
-	private String host;
-	
-	private int port;
-
 	private MemberStateMonitor monitor;
 	
 	private long timeout;
 	
 	private long clusterstateConvergencePeriod;
 	
+	private String memberId;
+	
 	public MemberStateObserver(String host, int port, MemberStateMonitor monitor, long timeout, long cscp) {
 		super();
-		this.host = host;
-		this.port = port;
+		this.memberId = host + ":" + port;
 		this.monitor = monitor;
 		this.timeout = timeout;
 		this.clusterstateConvergencePeriod = cscp;
@@ -41,10 +38,10 @@ public class MemberStateObserver implements Runnable {
 			
 			MemberStateTable table = monitor.copyMemberStateTable();
 			
-			logger.info("Members state from member " + host + ":" + port + " " 
+			logger.info("Members state from member " + memberId + " " 
 					   + table.toString());
 			
-			logger.info("Members state from member " + host + ":" + port + " seen by members: " 
+			logger.info("Members state from member " + memberId + " seen by members: " 
 					   + table.toStringSeenBy());
 			
 			boolean convergedState = true;

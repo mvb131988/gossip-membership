@@ -30,6 +30,7 @@ public class Main {
 		
 		logger.info("Starting member at " + host + ":" + port);
 		
+		//TODO: move this to InboundConnectionManager
 		ServerSocket ss = null;
 		try {
 			ss = new ServerSocket();
