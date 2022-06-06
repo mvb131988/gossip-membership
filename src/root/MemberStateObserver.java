@@ -19,7 +19,12 @@ public class MemberStateObserver implements Runnable {
 	
 	private String memberId;
 	
-	public MemberStateObserver(String host, int port, MemberStateMonitor monitor, long timeout, long cscp) {
+	public MemberStateObserver(String host, 
+							   int port, 
+							   MemberStateMonitor monitor, 
+							   long timeout, 
+							   long cscp) 
+	{
 		super();
 		this.memberId = host + ":" + port;
 		this.monitor = monitor;

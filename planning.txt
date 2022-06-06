@@ -55,4 +55,4 @@ START 2 NODES LOCALLY:
    	 java -jar gossip-membership.jar 8082
 =========================================================================================
 
-+ rename hostPort to memberId
++ TODOs

@@ -81,7 +81,7 @@ public class Main {
 		long t5 = AppProperties.memberstatetableChangeFrequency();
 		MemberStateManager msma = new MemberStateManager(msm, t5);
 		Thread tcmt = new Thread(msma);
-		tcmt.setName("TimeoutConnectionManager");
+		tcmt.setName("MemberStateManager");
 		tcmt.start();
 		
 		logger.info("Member state observer thread");
