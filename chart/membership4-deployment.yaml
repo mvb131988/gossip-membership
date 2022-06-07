@@ -3,33 +3,33 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: membership3-deployment
+  name: membership4-deployment
   labels:
-    app: membership3
+    app: membership4
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: membership3
+      app: membership4
   template:
     metadata:
       labels:
-        app: membership3
+        app: membership4
     spec:
       containers:
-        - name: membership3
+        - name: membership4
           image: membership
           ports:
             - name: http
-              containerPort: 8083
+              containerPort: 8084
               protocol: TCP
           env:
             - name: DEBUG_PORT
-              value: "4003"
+              value: "4004"
             - name: HOST
-              value: "membership3-service.default.svc.cluster.local"
+              value: "membership4-service.default.svc.cluster.local"
             - name: NODES
               value: "membership1-service.default.svc.cluster.local:8081;membership2-service.default.svc.cluster.local:8082;membership3-service.default.svc.cluster.local:8083;membership4-service.default.svc.cluster.local:8084"
             - name: PORT
-              value: "8083"
+              value: "8084"
           imagePullPolicy: Never

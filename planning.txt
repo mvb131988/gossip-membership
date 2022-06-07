@@ -30,6 +30,7 @@ RUN STEPS:
 kubectl apply -f chart\membership1-service.yaml
 kubectl apply -f chart\membership2-service.yaml
 kubectl apply -f chart\membership3-service.yaml
+kubectl apply -f chart\membership4-service.yaml
 
 build.bat
 
@@ -54,5 +55,7 @@ START 2 NODES LOCALLY:
  (3) from IDE:
    	 java -jar gossip-membership.jar 8082
 =========================================================================================
+
+kubectl cp membership1-deployment-b7f789478-jkgts:/tmp/log.txt log1.txt 
 
 + TODOs

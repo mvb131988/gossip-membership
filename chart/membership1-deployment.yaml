@@ -29,7 +29,7 @@ spec:
             - name: HOST
               value: "membership1-service.default.svc.cluster.local"
             - name: NODES
-              value: "membership1-service.default.svc.cluster.local:8081;membership2-service.default.svc.cluster.local:8082;membership3-service.default.svc.cluster.local:8083"
+              value: "membership1-service.default.svc.cluster.local:8081;membership2-service.default.svc.cluster.local:8082;membership3-service.default.svc.cluster.local:8083;membership4-service.default.svc.cluster.local:8084"
             - name: PORT
               value: "8081"
           imagePullPolicy: Never
